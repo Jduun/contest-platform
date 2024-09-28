@@ -1,0 +1,42 @@
+[tool.poetry]
+name = "backend"
+version = "0.1.0"
+description = ""
+authors = ["Jduun <isaevstanislav2003@mail.ru>"]
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.10"
+fastapi = "^0.114.2"
+pydantic-settings = "^2.5.2"
+asyncpg = "^0.29.0"
+alembic = "^1.13.2"
+uvicorn = "^0.30.6"
+bcrypt = "^4.2.0"
+pyjwt = "^2.9.0"
+pydantic = "^2.9.1"
+sqlalchemy = "^2.0.34"
+python-multipart = "^0.0.9"
+
+
+[tool.poetry.group.dev.dependencies]
+pytest = "^8.3.3"
+mypy = "^1.11.2"
+black = "^24.8.0"
+isort = "^5.13.2"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
+
+[tool.isort]
+multi_line_output = 3
+include_trailing_comma = true
+force_grid_wrap = 0
+use_parentheses = true
+line_length = 88
+
+[tool.black]
+line-length = 88
+target-version = ['py310']
+include = '\.pyi?$'
