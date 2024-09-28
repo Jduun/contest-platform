@@ -33,15 +33,15 @@ def create_access_token(token_data: dict, expires_delta: timedelta) -> str:
     return encoded_jwt
 
 
-async def get_default_role(db_session: AsyncSession) -> Optional[Role]:
-    query = select(Role).filter_by(name="user")
+async def get_role_by_name(db_session: AsyncSession, name: str) -> Optional[Role]:
+    query = select(Role).filter_by(name=name)
     res = await db_session.execute(query)
-    default_role = res.scalars().first()
-    return default_role
+    role = res.scalars().first()
+    return role
 
 
 async def add_user(db_session: AsyncSession, user_add: UserAdd) -> User:
-    default_role = await get_default_role(db_session)
+    default_role = await get_role_by_name(db_session, name="user")
     query = (
         insert(User)
         .values(**user_add.model_dump(), role_id=default_role.id)
