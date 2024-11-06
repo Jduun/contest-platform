@@ -16,7 +16,3 @@ class Submission(Base):
     contest_id: Mapped[Optional[uuid.UUID]] = mapped_column(ForeignKey("contest.id"))
     score: Mapped[int]
     submitted_at: Mapped[timestamp]
-
-    user: Mapped["User"] = relationship(back_populates="submissions")
-    problem: Mapped["Problem"] = relationship(back_populates="submissions")
-    contest: Mapped["Contest"] = relationship(back_populates="submissions")
