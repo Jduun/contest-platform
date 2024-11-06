@@ -14,13 +14,8 @@ class Problem(Base):
     title: Mapped[str] = mapped_column(String(255), unique=True)
     statement: Mapped[str]
     tests = mapped_column(JSON, nullable=False)
+    memory_limit: Mapped[int]
+    time_limit: Mapped[int]
     difficulty: Mapped[Difficulty]
-    is_in_contest: Mapped[bool]
     created_at: Mapped[timestamp]
     updated_at: Mapped[timestamp_updated]
-
-    submissions: Mapped[list["Submission"]] = relationship(back_populates="problem")
-    author: Mapped["User"] = relationship(back_populates="problems")
-    contests: Mapped[list["Contest"]] = relationship(
-        back_populates="problems", secondary="contest_problem"
-    )

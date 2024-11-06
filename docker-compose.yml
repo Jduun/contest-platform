@@ -1,0 +1,43 @@
+services:
+  backend:
+    build:
+      context: ./backend
+    container_name: backend
+    restart: unless-stopped
+    volumes:
+      - ./backend:/backend
+    ports:
+      - "${BACKEND_PORT}:${BACKEND_PORT}"
+    env_file:
+      - .env
+    depends_on:
+      - db
+    entrypoint: /backend/entrypoint.sh
+    networks:
+      - app-network 
+
+  db:
+    image: postgres:17
+    container_name: postgres-db
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: ${DB_USER}
+      POSTGRES_PASSWORD: ${DB_PASS}
+      POSTGRES_DB: ${DB_NAME}
+    volumes:
+      - ${DB_PATH}:/var/lib/postgresql/data
+    ports:
+      - "${DB_PORT}:${DB_PORT}"
+    networks:
+      - app-network
+
+  adminer:
+    image: adminer
+    restart: unless-stopped
+    ports:
+      - "${ADMINER_PORT}:${ADMINER_PORT}"
+    networks:
+      - app-network
+
+networks:
+  app-network:

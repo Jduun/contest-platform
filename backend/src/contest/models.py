@@ -16,14 +16,6 @@ class Contest(Base):
     created_at: Mapped[timestamp]
     updated_at: Mapped[timestamp_updated]
 
-    submissions: Mapped[list["Submission"]] = relationship(back_populates="contest")
-    users: Mapped[list["User"]] = relationship(
-        back_populates="contests", secondary="contest_user"
-    )
-    problems: Mapped[list["Problem"]] = relationship(
-        back_populates="contests", secondary="contest_problem"
-    )
-
 
 class ContestUser(Base):
     __tablename__ = "contest_user"

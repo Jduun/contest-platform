@@ -28,4 +28,4 @@ class Token(BaseModel):
 
 
 class TokenData(BaseModel):
-    name: str
+    username: str
