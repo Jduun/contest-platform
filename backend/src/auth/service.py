@@ -1,15 +1,16 @@
 from datetime import datetime, timedelta, timezone
-from typing import Optional
+from typing import Any, Optional
 
 import bcrypt
 import jwt
 from jwt.exceptions import InvalidTokenError
 from sqlalchemy import insert, select
+from sqlalchemy.exc import SQLAlchemyError
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from src.auth.exceptions import CredentialsError
+from src.auth.exceptions import CredentialsError, UsernameAlreadyExistsError
 from src.auth.models import Role, User
-from src.auth.schemas import TokenData, UserAdd, UserLogin
+from src.auth.schemas import UserAdd, UserLogin
 from src.config import settings
 
 
@@ -47,8 +48,11 @@ async def add_user(db_session: AsyncSession, user_add: UserAdd) -> User:
         .values(**user_add.model_dump(), role_id=default_role.id)
         .returning(User)
     )
-    res = await db_session.execute(query)
-    await db_session.commit()
+    try:
+        res = await db_session.execute(query)
+        await db_session.commit()
+    except SQLAlchemyError:
+        raise UsernameAlreadyExistsError
     return res.scalars().first()
 
 
@@ -62,24 +66,33 @@ async def get_user_by_username(
 
 async def authenticate(db_session: AsyncSession, user_login: UserLogin) -> User:
     user = await get_user_by_username(db_session, user_login.username)
+    if not user:
+        raise CredentialsError
     password_is_correct = verify_password(user_login.password, str(user.password))
-    if not (user and password_is_correct):
+    if not password_is_correct:
         raise CredentialsError
     return user
 
 
 async def get_current_user(db_session: AsyncSession, token: str) -> User:
     try:
-        payload = jwt.decode(
-            token, settings.SECRET_KEY, algorithms=[settings.ALGORITHM]
-        )
-        name: str = payload.get("sub")
-        if name is None:
-            raise CredentialsError
-        token_data = TokenData(name=name)
+        payload = get_token_payload(token)
     except InvalidTokenError:
         raise CredentialsError
-    user = await get_user_by_username(db_session, token_data.name)
+    username = payload.get("sub")
+    if username is None:
+        raise CredentialsError
+    user = await get_user_by_username(db_session, username)
     if user is None:
         raise CredentialsError
     return user
+
+
+def get_token_payload(token: str) -> Any:
+    try:
+        payload = jwt.decode(
+            token, settings.SECRET_KEY, algorithms=[settings.ALGORITHM]
+        )
+    except InvalidTokenError:
+        raise
+    return payload

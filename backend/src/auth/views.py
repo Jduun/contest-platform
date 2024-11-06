@@ -6,9 +6,9 @@ from fastapi.security import OAuth2PasswordRequestForm
 from sqlalchemy.ext.asyncio import AsyncSession
 
 import src.auth.service as auth_service
-from src.auth.exceptions import CredentialsError
+from src.auth.exceptions import CredentialsError, UsernameAlreadyExistsError
 from src.auth.schemas import Token, UserAdd, UserLogin, UserResponse
-from src.auth.service import authenticate, get_password_hash
+
 from src.config import settings
 from src.database import get_async_db_session
 
@@ -23,7 +23,7 @@ async def login(
 ) -> Token:
     user_login = UserLogin.model_validate(form_data)
     try:
-        user = await authenticate(db_session, user_login)
+        user = await auth_service.authenticate(db_session, user_login)
     except CredentialsError:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
@@ -42,13 +42,19 @@ async def register(
     user_add: UserAdd,
     db_session: Annotated[AsyncSession, Depends(get_async_db_session)],
 ) -> Any:
-    user_add.password = get_password_hash(user_add.password)
-    user = await auth_service.add_user(db_session, user_add)
+    user_add.password = auth_service.get_password_hash(user_add.password)
+    try:
+        user = await auth_service.add_user(db_session, user_add)
+    except UsernameAlreadyExistsError:
+        raise HTTPException(
+            status_code=status.HTTP_409_CONFLICT,
+            detail="User with the same name already exists",
+        )
     return user
 
 
 @user_router.get("/me", response_model=UserResponse)
-async def get_current_user(
+async def get_me(
     token: Annotated[str, Depends(settings.oauth2)],
     db_session: Annotated[AsyncSession, Depends(get_async_db_session)],
 ) -> Any:
