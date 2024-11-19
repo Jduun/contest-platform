@@ -3,4 +3,4 @@
 chmod -R a+w ./migrations
 chmod a+w ./alembic.ini
 alembic upgrade head
-uvicorn src.main:app --host 0.0.0.0 --port "${BACKEND_PORT}"
+uvicorn src.main:app --host 0.0.0.0 --port "${BACKEND_PORT}" --reload
