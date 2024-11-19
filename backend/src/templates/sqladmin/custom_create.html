@@ -1,0 +1,33 @@
+{% extends "sqladmin/create.html" %}
+
+{% block tail %}
+    <link rel="stylesheet" href="https://uicdn.toast.com/editor/latest/toastui-editor.min.css">
+    <script src="https://uicdn.toast.com/editor/latest/toastui-editor-all.min.js"></script>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const textarea = document.querySelector('textarea[name="statement"]');
+
+            if (textarea) {
+                const editorContainer = document.createElement('div');
+                textarea.style.display = 'none'; // Hide original field
+                textarea.parentNode.insertBefore(editorContainer, textarea);
+
+                // Инициализация Toast UI Editor
+                const editor = new toastui.Editor({
+                    el: editorContainer,
+                    height: '500px',
+                    initialEditType: 'markdown', // (markdown или wysiwyg)
+                    previewStyle: 'vertical',    // (horizontal or vertical)
+                    initialValue: textarea.value,
+                });
+
+                // Synchronizing data before submitting a form
+                document.querySelector('form').addEventListener('mousedown', function () {
+                    textarea.value = editor.getMarkdown();
+                    textarea.style.display = 'true';
+                });
+            }
+        });
+    </script>
+{% endblock %}
