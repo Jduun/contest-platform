@@ -276,8 +276,10 @@ class SubmissionAdmin(ModelView, model=Submission):
     icon = "fa-solid fa-paper-plane"
     column_list = [
         Submission.id,
-        Submission.token,
         Submission.code,
+        Submission.language_id,
+        Submission.status,
+        Submission.stderr,
         Submission.user,
         Submission.problem,
         Submission.submitted_at,

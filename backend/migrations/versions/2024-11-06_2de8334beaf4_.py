@@ -127,8 +127,10 @@ def upgrade() -> None:
     op.create_table(
         "submission",
         sa.Column("id", sa.Uuid(), nullable=False),
-        sa.Column("token", sa.String(), nullable=False),
         sa.Column("code", sa.String(), nullable=False),
+        sa.Column("language_id", sa.Integer(), nullable=False),
+        sa.Column("status", sa.String(), nullable=False),
+        sa.Column("stderr", sa.String(), nullable=False),
         sa.Column("user_id", sa.Uuid(), nullable=False),
         sa.Column("problem_id", sa.Uuid(), nullable=False),
         sa.Column(
