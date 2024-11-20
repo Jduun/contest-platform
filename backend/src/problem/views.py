@@ -1,23 +1,18 @@
 import uuid
-from typing import Annotated, Any
+from typing import Annotated
 
-from fastapi import APIRouter, Body, Depends, HTTPException, Security, status
-from sqlalchemy.ext.asyncio import AsyncSession
+from fastapi import APIRouter, HTTPException, Security, status
 
 import src.auth.service as auth_service
 import src.problem.service as problem_service
-import src.utils as utils
-from src.auth.exceptions import CredentialsError
 from src.auth.models import User
 from src.auth.roles import Roles
-from src.config import settings
 from src.database import DbSession
 from src.problem.exceptions import (
     OffsetAndLimitMustNotBeNegative,
-    ProblemAlreadyExistsError,
     ProblemDoesNotExistError,
 )
-from src.problem.schemas import ProblemAdd, ProblemResponse, ProblemUpdate
+from src.problem.schemas import ProblemResponse
 
 problem_router = APIRouter(prefix="/problems", tags=["Problems"])
 
