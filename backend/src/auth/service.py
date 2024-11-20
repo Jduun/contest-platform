@@ -1,17 +1,24 @@
 from datetime import datetime, timedelta, timezone
-from typing import Any, Optional
+from typing import Annotated, Any, Optional
 
 import bcrypt
 import jwt
+from fastapi import Depends, HTTPException, status
+from fastapi.security import SecurityScopes
 from jwt.exceptions import InvalidTokenError
 from sqlalchemy import insert, select
 from sqlalchemy.exc import SQLAlchemyError
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from src.auth.exceptions import CredentialsError, UsernameAlreadyExistsError
+from src.auth.exceptions import (
+    CredentialsError,
+    NotEnoughPermissions,
+    UsernameAlreadyExistsError,
+)
 from src.auth.models import Role, User
 from src.auth.schemas import UserAdd, UserLogin
 from src.config import settings
+from src.database import DbSession
 
 
 def verify_password(entered_password: str, password_hash: str):
@@ -27,10 +34,8 @@ def get_password_hash(password: str) -> str:
 def create_access_token(token_data: dict, expires_delta: timedelta) -> str:
     to_encode = token_data.copy()
     expire = datetime.now(timezone.utc) + expires_delta
-    to_encode.update({"exp": expire})
-    encoded_jwt = jwt.encode(
-        to_encode, settings.SECRET_KEY, algorithm=settings.ALGORITHM
-    )
+    to_encode["exp"] = expire
+    encoded_jwt = jwt.encode(to_encode, settings.SECRET_KEY, algorithm=settings.ALGORITHM)
     return encoded_jwt
 
 
@@ -56,9 +61,7 @@ async def add_user(db_session: AsyncSession, user_add: UserAdd) -> User:
     return res.scalars().first()
 
 
-async def get_user_by_username(
-    db_session: AsyncSession, username: str
-) -> Optional[User]:
+async def get_user_by_username(db_session: AsyncSession, username: str) -> Optional[User]:
     query = select(User).filter_by(username=username)
     res = await db_session.execute(query)
     return res.scalars().first()
@@ -74,25 +77,51 @@ async def authenticate(db_session: AsyncSession, user_login: UserLogin) -> User:
     return user
 
 
-async def get_current_user(db_session: AsyncSession, token: str) -> User:
+async def get_current_user(
+    security_scopes: SecurityScopes,
+    token: Annotated[str, Depends(settings.oauth2)],
+    db_session: DbSession,
+) -> User:
+    if security_scopes.scopes:
+        authenticate_value = f'Bearer scope="{security_scopes.scope_str}"'
+    else:
+        authenticate_value = "Bearer"
+
+    credentials_exception = HTTPException(
+        status_code=status.HTTP_401_UNAUTHORIZED,
+        detail="Incorrect username or password",
+        headers={"WWW-Authenticate": "Bearer"},
+    )
+    not_enough_permissions_exception = HTTPException(
+        status_code=status.HTTP_401_UNAUTHORIZED,
+        detail="Not enough permissions",
+        headers={"WWW-Authenticate": authenticate_value},
+    )
+
     try:
         payload = get_token_payload(token)
     except InvalidTokenError:
-        raise CredentialsError
-    username = payload.get("sub")
+        raise credentials_exception
+
+    username = payload.get("username")
+    role_from_token = payload.get("role", [])
     if username is None:
-        raise CredentialsError
+        raise credentials_exception
+
     user = await get_user_by_username(db_session, username)
     if user is None:
-        raise CredentialsError
-    return user
+        raise credentials_exception
+
+    permitted_roles = security_scopes.scopes
+    for role in permitted_roles:
+        if role == role_from_token:
+            return user
+    raise not_enough_permissions_exception
 
 
 def get_token_payload(token: str) -> Any:
     try:
-        payload = jwt.decode(
-            token, settings.SECRET_KEY, algorithms=[settings.ALGORITHM]
-        )
+        payload = jwt.decode(token, settings.SECRET_KEY, algorithms=[settings.ALGORITHM])
     except InvalidTokenError:
         raise
     return payload

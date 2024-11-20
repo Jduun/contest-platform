@@ -9,9 +9,10 @@ Create Date: 2024-11-06 11:29:37.503108
 import uuid
 from typing import Sequence, Union
 
-from alembic import op
 import sqlalchemy as sa
+from alembic import op
 
+from src.auth.roles import Roles
 
 # revision identifiers, used by Alembic.
 revision: str = "2de8334beaf4"
@@ -94,13 +95,14 @@ def upgrade() -> None:
             sa.Enum("easy", "medium", "hard", name="difficulty"),
             nullable=False,
         ),
+        sa.Column("is_in_contest", sa.Boolean(), nullable=False),
         sa.Column(
             "created_at", sa.DateTime(), server_default=sa.text("now()"), nullable=False
         ),
         sa.Column(
             "updated_at", sa.DateTime(), server_default=sa.text("now()"), nullable=False
         ),
-        sa.Column("tests", sa.JSON(), nullable=False),
+        sa.Column("tests", sa.String(), nullable=False),
         sa.ForeignKeyConstraint(
             ["author_id"],
             ["user.id"],
@@ -125,16 +127,14 @@ def upgrade() -> None:
     op.create_table(
         "submission",
         sa.Column("id", sa.Uuid(), nullable=False),
+        sa.Column("code", sa.String(), nullable=False),
+        sa.Column("language_id", sa.Integer(), nullable=False),
+        sa.Column("status", sa.String(), nullable=False),
+        sa.Column("stderr", sa.String(), nullable=False),
         sa.Column("user_id", sa.Uuid(), nullable=False),
         sa.Column("problem_id", sa.Uuid(), nullable=False),
-        sa.Column("contest_id", sa.Uuid(), nullable=True),
-        sa.Column("score", sa.Integer(), nullable=False),
         sa.Column(
             "submitted_at", sa.DateTime(), server_default=sa.text("now()"), nullable=False
-        ),
-        sa.ForeignKeyConstraint(
-            ["contest_id"],
-            ["contest.id"],
         ),
         sa.ForeignKeyConstraint(
             ["problem_id"],
@@ -152,18 +152,19 @@ def upgrade() -> None:
         [
             {
                 "id": uuid.uuid4(),
-                "name": "user",
+                "name": Roles.user,
             },
             {
                 "id": uuid.uuid4(),
-                "name": "organizer",
+                "name": Roles.organizer,
             },
             {
                 "id": uuid.uuid4(),
-                "name": "admin",
+                "name": Roles.admin,
             },
         ],
     )
+
 
 def downgrade() -> None:
     op.drop_table("submission")
