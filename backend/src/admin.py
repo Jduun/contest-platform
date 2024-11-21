@@ -136,7 +136,6 @@ class UserAdmin(ModelView, model=User):
         User.id,
         User.username,
         User.password,
-        User.rating,
         User.registered_at,
         User.role,
     ]
@@ -148,7 +147,7 @@ class UserAdmin(ModelView, model=User):
     ]
     form_columns = column_details_list
     column_searchable_list = [User.username]
-    column_sortable_list = [User.username, User.rating, User.registered_at]
+    column_sortable_list = [User.username, User.registered_at]
 
 
 class ProblemAdmin(ModelView, model=Problem):

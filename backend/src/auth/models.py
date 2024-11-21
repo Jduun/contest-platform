@@ -25,7 +25,6 @@ class User(Base):
     username: Mapped[str] = mapped_column(String(50), unique=True)
     password: Mapped[str]
     role_id: Mapped[uuid.UUID] = mapped_column(ForeignKey("role.id"))
-    rating: Mapped[int] = mapped_column(default=0)
     registered_at: Mapped[timestamp]
 
     role: Mapped["Role"] = relationship(back_populates="users", lazy="joined")
