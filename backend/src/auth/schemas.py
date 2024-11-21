@@ -18,7 +18,6 @@ class UserResponse(BaseModel):
     id: UUID
     username: str
     role_id: UUID
-    rating: int
     registered_at: datetime
 
 
