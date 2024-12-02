@@ -18,10 +18,15 @@ export function SignUpForm() {
   const navigate = useNavigate();
   const [username, setUsername] = useState<string>("");
   const [password, setPassword] = useState<string>("");
+  const [confirmedPassword, setConfirmedPassword] = useState<string>("");
   const [error, setError] = useState<string | null>(null);
 
   const handleSignUp = async () => {
     setError(null);
+    if (password !== confirmedPassword) {
+      setError("Пароли не совпадают");
+      return;
+    }    
     try {
       const registerResponse = await axios.post("http://localhost/api/register", { username, password });
       // Use URLSearchParams to send data in x-www-form-urlencoded format
@@ -38,7 +43,6 @@ export function SignUpForm() {
       const { access_token, token_type } = loginResponse.data;
       // Save the token to localStorage
       localStorage.setItem("token", `${access_token}`);
-      alert("Регистрация прошла успешно!");
       navigate("/")
     } catch (err: any) {
       setError(err.response?.data?.detail || "An unexpected error occurred");
@@ -46,67 +50,77 @@ export function SignUpForm() {
   };
 
   return (
-    <Card className="w-[350px]">
-      <CardHeader>
-        <CardTitle className="text-2xl">Регистрация</CardTitle>
-        <CardDescription>Придумайте имя пользователя и пароль</CardDescription>
-      </CardHeader>
-      <CardContent>
-        <form
-          onSubmit={(e) => {
-            e.preventDefault();
-            handleSignUp();
-          }}
-        >
-          <div className="grid w-full text-left gap-4">
-            <div className="flex flex-col space-y-1.5">
-              <Label htmlFor="username">Имя пользователя</Label>
-              <Input
-                id="username"
-                value={username}
-                onChange={(e) => setUsername(e.target.value)}
-              />
-            </div>
-            <div className="flex flex-col space-y-1.5">
-              <Label htmlFor="password">Пароль</Label>
-              <Input
-                id="password"
-                type="password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-              />
-            </div>
-          </div>
-          {error && (
-            <p className="text-red-500 text-sm mt-2">
-              {error}
-            </p>
-          )}
-        </form>
-      </CardContent>
-      <CardFooter className="flex flex-col">
-        <div className="w-full">
-          <Button
-            type="submit"
-            className="w-full"
-            onClick={(e) => {
+    <div className="flex justify-center items-center h-screen">
+      <Card className="w-[350px] text-center">
+        <CardHeader>
+          <CardTitle className="text-2xl">Регистрация</CardTitle>
+          <CardDescription>Придумайте имя пользователя и пароль</CardDescription>
+        </CardHeader>
+        <CardContent>
+          <form
+            onSubmit={(e) => {
               e.preventDefault();
               handleSignUp();
             }}
           >
-            Создать аккаунт
-          </Button>
-        </div>
-        <div className="mt-4 text-center text-sm">
-          У Вас уже есть аккаунт?{" "}
-        </div>
-        <div className="text-center text-sm">
-          <Link to="/login" className="underline">
-            Войдите в аккаунт здесь
-          </Link>
-        </div>
-
-      </CardFooter>
-    </Card>
+            <div className="grid w-full text-left gap-4">
+              <div className="flex flex-col space-y-1.5">
+                <Label htmlFor="username">Имя пользователя</Label>
+                <Input
+                  id="username"
+                  value={username}
+                  onChange={(e) => setUsername(e.target.value)}
+                />
+              </div>
+              <div className="flex flex-col space-y-1.5">
+                <Label htmlFor="password">Пароль</Label>
+                <Input
+                  id="password"
+                  type="password"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                />
+              </div>
+              <div className="flex flex-col space-y-1.5">
+                <Label htmlFor="confimed_password">Подтвердите пароль</Label>
+                <Input
+                  id="confimed_password"
+                  type="password"
+                  value={confirmedPassword}
+                  onChange={(e) => setConfirmedPassword(e.target.value)}
+                />
+              </div>
+            </div>
+            {error && (
+              <p className="text-red-500 text-sm mt-2">
+                {error}
+              </p>
+            )}
+          </form>
+        </CardContent>
+        <CardFooter className="flex flex-col">
+          <div className="w-full">
+            <Button
+              type="submit"
+              className="w-full"
+              onClick={(e) => {
+                e.preventDefault();
+                handleSignUp();
+              }}
+            >
+              Создать аккаунт
+            </Button>
+          </div>
+          <div className="mt-4 text-center text-sm">
+            У Вас уже есть аккаунт?{" "}
+          </div>
+          <div className="text-center text-sm">
+            <Link to="/login" className="underline">
+              Войдите в аккаунт здесь
+            </Link>
+          </div>
+        </CardFooter>
+      </Card>
+    </div>
   );
 }

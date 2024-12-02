@@ -37,74 +37,76 @@ export function LoginForm() {
       const { access_token, token_type } = response.data;
       // Save the token to localStorage
       localStorage.setItem("token", `${access_token}`);
-      alert("Вы успешно вошли в аккаунт!");
-      navigate("/")
+      navigate("/");
+    
     } catch (err: any) {
       setError(err.response?.data?.detail || "An unexpected error occurred");
     }
   };
 
   return (
-    <Card className="w-[350px]">
-      <CardHeader>
-        <CardTitle className="text-2xl">Вход</CardTitle>
-        <CardDescription>Введите данные своей учетной записи</CardDescription>
-      </CardHeader>
-      <CardContent>
-        <form
-          onSubmit={(e) => {
-            e.preventDefault();
-            handleLogin();
-          }}
-        >
-          <div className="grid w-full text-left gap-4">
-            <div className="flex flex-col space-y-1.5">
-              <Label htmlFor="username">Имя пользователя</Label>
-              <Input
-                id="username"
-                value={username}
-                onChange={(e) => setUsername(e.target.value)}
-              />
-            </div>
-            <div className="flex flex-col space-y-1.5">
-              <Label htmlFor="password">Пароль</Label>
-              <Input
-                id="password"
-                type="password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-              />
-            </div>
-          </div>
-          {error && (
-            <p className="text-red-500 text-sm mt-2">
-              {error}
-            </p>
-          )}
-        </form>
-      </CardContent>
-      <CardFooter className="flex flex-col">
-        <div className="w-full">
-          <Button
-            type="submit"
-            className="w-full"
-            onClick={(e) => {
+    <div className="flex justify-center items-center h-screen">
+      <Card className="w-[350px] text-center">
+        <CardHeader>
+          <CardTitle className="text-2xl">Вход</CardTitle>
+          <CardDescription>Введите данные своей учетной записи</CardDescription>
+        </CardHeader>
+        <CardContent>
+          <form
+            onSubmit={(e) => {
               e.preventDefault();
               handleLogin();
             }}
           >
-            Войти
-          </Button>
-        </div>
-        <div className="mt-4 text-center text-sm">
-          У Вас еще нет аккаунта?{" "}
-        </div>
-        <div className="text-center text-sm">
-          <Link to="/signup" className="underline">
-            Создайте аккаунт здесь
-          </Link>
-        </div>
-      </CardFooter>
-    </Card>
+            <div className="grid w-full text-left gap-4">
+              <div className="flex flex-col space-y-1.5">
+                <Label htmlFor="username">Имя пользователя</Label>
+                <Input
+                  id="username"
+                  value={username}
+                  onChange={(e) => setUsername(e.target.value)}
+                />
+              </div>
+              <div className="flex flex-col space-y-1.5">
+                <Label htmlFor="password">Пароль</Label>
+                <Input
+                  id="password"
+                  type="password"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                />
+              </div>
+            </div>
+            {error && (
+              <p className="text-red-500 text-sm mt-2">
+                {error}
+              </p>
+            )}
+          </form>
+        </CardContent>
+        <CardFooter className="flex flex-col">
+          <div className="w-full">
+            <Button
+              type="submit"
+              className="w-full"
+              onClick={(e) => {
+                e.preventDefault();
+                handleLogin();
+              }}
+            >
+              Войти
+            </Button>
+          </div>
+          <div className="mt-4 text-center text-sm">
+            У Вас еще нет аккаунта?{" "}
+          </div>
+          <div className="text-center text-sm">
+            <Link to="/signup" className="underline">
+              Создайте аккаунт здесь
+            </Link>
+          </div>
+        </CardFooter>
+      </Card>
+    </div>
   );
 }
