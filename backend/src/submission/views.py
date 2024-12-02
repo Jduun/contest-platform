@@ -1,3 +1,4 @@
+import uuid
 import json
 from typing import Annotated
 
@@ -17,7 +18,7 @@ submission_router = APIRouter(prefix="/submissions", tags=["Submissions"])
 
 
 @submission_router.post("/")
-async def submit_code(
+async def init_submission(
     submission_add: SubmissionAdd,
     user: Annotated[
         User,
@@ -28,9 +29,29 @@ async def submit_code(
     ],
     db_session: DbSession,
 ):
-    # TODO: error handling, add limitations, language
+    submission = await submission_service.add_submission(
+        db_session, submission_add, user.id, "In progress", ""
+    )
+    return submission.id
+
+
+@submission_router.get("/{submission_id}")
+async def submit_code(
+    submission_id: uuid.UUID,
+    db_session: DbSession,
+):
     # I use Server Side Events (SSE) here
     return StreamingResponse(
-        submission_service.submit_code_using_sse(db_session, submission_add, user.id),
+        submission_service.submit_code_sse(db_session, submission_id),
         media_type="text/event-stream",
     )
+
+
+"""
+    user: Annotated[
+        User,
+        Security(
+            auth_service.get_current_user,
+            scopes=[Roles.admin, Roles.organizer, Roles.user],
+        ),
+    ],"""

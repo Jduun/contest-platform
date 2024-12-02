@@ -247,7 +247,12 @@ class ContestAdmin(ModelView, model=Contest):
         Contest.updated_at,
     ]
     column_details_list = column_list
-    form_columns = column_list
+    form_columns = [
+        Contest.id,
+        Contest.name,
+        Contest.start_time,
+        Contest.end_time,
+    ]
     column_searchable_list = [Contest.name]
     column_sortable_list = [
         Contest.name,

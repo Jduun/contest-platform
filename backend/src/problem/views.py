@@ -31,13 +31,13 @@ async def get_problems(
     db_session: DbSession,
 ):
     try:
-        problem = await problem_service.get_problems(db_session, offset, limit)
+        problems = await problem_service.get_problems(db_session, offset, limit)
     except OffsetAndLimitMustNotBeNegative:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail="Offset and limit must not be negative",
         )
-    return problem
+    return problems
 
 
 @problem_router.get("/{problem_id}", response_model=ProblemResponse)
