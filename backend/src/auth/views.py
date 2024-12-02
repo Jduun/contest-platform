@@ -48,7 +48,7 @@ async def register(
     except UsernameAlreadyExistsError:
         raise HTTPException(
             status_code=status.HTTP_409_CONFLICT,
-            detail="User with the same name already exists",
+            detail="Пользователь с таким именем уже существует",
         )
     return user
 
@@ -68,6 +68,6 @@ async def get_me(
     except CredentialsError:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Incorrect username or password",
+            detail="Неверное имя пользователя или пароль",
             headers={"WWW-Authenticate": "Bearer"},
         )

@@ -25,9 +25,6 @@ async def get_problems(
 
 async def get_problem_by_id(db_session: AsyncSession, problem_id: uuid.UUID) -> Problem:
     query = select(Problem).filter_by(id=problem_id)
-    try:
-        res = await db_session.execute(query)
-    except SQLAlchemyError:
-        raise ProblemDoesNotExistError
+    res = await db_session.execute(query)
     await db_session.commit()
     return res.scalars().first()

@@ -1,13 +1,16 @@
+import math
 import asyncio
 import json
 import uuid
 from typing import Any
 
 import requests
-from sqlalchemy import insert
+from sqlalchemy import insert, select, update
 from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy.exc import SQLAlchemyError
 
 import src.problem.service as problem_service
+from src.submission.exceptions import SubmissionDoesNotExistError
 from src.config import settings
 from src.problem.models import Problem
 from src.submission.models import Submission
@@ -32,73 +35,6 @@ def get_languages():
     return languages
 
 
-async def submit_code_using_sse(
-    db_session: AsyncSession, submission_add: SubmissionAdd, user_id: uuid.UUID
-):
-    error_occurs = False
-    problem: Problem = await problem_service.get_problem_by_id(
-        db_session, submission_add.problem_id
-    )
-    tests = json.loads(problem.tests)
-    submission_status = ""
-    for i, test in enumerate(tests):
-        if error_occurs:
-            break
-        submission_response = requests.post(
-            f"{settings.code_exe_url}/submissions",
-            data={
-                "source_code": submission_add.code,
-                "language_id": submission_add.language_id,
-                "stdin": test["input"],
-            },
-        )
-        submission_token = submission_response.json().get("token")
-        IN_QUEUE_STATUS_ID = 1
-        ACCEPTED_STATUS_ID = 3
-        status_id = IN_QUEUE_STATUS_ID
-        submission_status = ""
-        stderr = ""
-        while status_id < ACCEPTED_STATUS_ID:
-            submission_result = requests.get(
-                f"{settings.code_exe_url}/submissions/{submission_token}"
-            )
-            status = submission_result.json().get("status")
-            status_id = status["id"]
-            status_description = status["description"]
-            stderr = submission_result.json().get("stderr")
-            expected_output: str = submission_result.json().get("stdout")
-
-            if expected_output:
-                expected_output = expected_output.strip()
-
-            real_output = test["output"]
-
-            if status_id == ACCEPTED_STATUS_ID:
-                if expected_output != real_output:
-                    submission_status = f"Test {i}: Failed"
-                    error_occurs = True
-                elif i == len(tests) - 1:
-                    submission_status = "Accepted"
-                else:
-                    submission_status = f"Test {i}: Passed"
-            else:
-                submission_status = f"Test {i}: {status_description}"
-                if status_id > ACCEPTED_STATUS_ID:
-                    error_occurs = True
-
-            yield f"event: locationUpdate\ndata: {submission_status}\n\n"
-
-            if error_occurs:
-                break
-            # await asyncio.sleep(0.5)
-
-    if stderr is None:
-        stderr = ""
-    submission = await add_submission(
-        db_session, submission_add, user_id, submission_status, stderr
-    )
-
-
 async def add_submission(
     db_session: AsyncSession,
     submission_add: SubmissionAdd,
@@ -116,3 +52,81 @@ async def add_submission(
     res = await db_session.execute(query)
     await db_session.commit()
     return res.scalars().first()
+
+
+async def get_submission_by_id(
+    db_session: AsyncSession, submission_id: uuid.UUID
+) -> Submission:
+    query = select(Submission).filter_by(id=submission_id)
+    res = await db_session.execute(query)
+    await db_session.commit()
+    return res.scalars().first()
+
+
+async def submit_code_sse(db_session: AsyncSession, submission_id: uuid.UUID):
+    submission = await get_submission_by_id(db_session, submission_id)
+    problem: Problem = await problem_service.get_problem_by_id(
+        db_session, submission.problem_id
+    )
+    tests = json.loads(problem.tests)
+    submissions = []
+    for test in tests:
+        submissions.append(
+            {
+                "language_id": submission.language_id,
+                "source_code": submission.code,
+                "stdin": test["input"],
+                "expected_output": test["output"],
+                "cpu_time_limit": problem.time_limit,
+                "memory_limit": problem.memory_limit * 1024,
+            }
+        )
+    submissions_batch_response = requests.post(
+        f"{settings.code_exe_url}/submissions/batch", json={"submissions": submissions}
+    )
+    submission_tokens = [i["token"] for i in submissions_batch_response.json()]
+
+    PROCESSING_STATUS_ID = 1
+    ACCEPTED_STATUS_ID = 3
+    status_id = -1
+    status_description = ""
+    stderr = ""
+    while status_id < ACCEPTED_STATUS_ID:
+        submissions_response = requests.get(
+            f"{settings.code_exe_url}/submissions/batch",
+            params={"tokens": ",".join(submission_tokens)},
+        )
+        submissions_info = submissions_response.json()
+
+        statuses = []
+        for test_number, submission_info in enumerate(submissions_info["submissions"]):
+            curr_status_id = submission_info["status"]["id"]
+            curr_status_description = submission_info["status"]["description"]
+            curr_stderr = submission_info["stderr"]
+            statuses.append(
+                (curr_status_id, curr_status_description, test_number, curr_stderr)
+            )
+        if all([i[0] == ACCEPTED_STATUS_ID for i in statuses]):
+            status_id = ACCEPTED_STATUS_ID
+            status_description = "Accepted"
+        elif any([i[0] < ACCEPTED_STATUS_ID for i in statuses]):
+            status_id = PROCESSING_STATUS_ID
+            status_description = "Processing"
+        else:
+            for i in statuses:
+                if i[0] > ACCEPTED_STATUS_ID:
+                    status_id = i[0]
+                    status_description = f"Test {i[2] + 1}: {i[1]}"
+                    stderr = curr_stderr
+                    break
+
+        yield f"event: locationUpdate\ndata: {status_description}{'. ' + curr_stderr if curr_stderr else ''}\n\n"
+        await asyncio.sleep(1)
+
+    query = (
+        update(Submission)
+        .filter_by(id=submission_id)
+        .values(status=status_description, stderr=stderr)
+    )
+    await db_session.execute(query)
+    await db_session.commit()
