@@ -1,13 +1,13 @@
 import './App.css'
-import { BrowserRouter as Router, Route, Routes } from "react-router-dom"
+import { BrowserRouter as Router, Route, Routes } from 'react-router-dom'
 import { LoginForm } from './pages/LoginForm'
 import { SignUpForm } from './pages/SignUpForm'
 import { ProblemList } from './pages/ProblemList'
 import { ProblemPage } from './pages/ProblemPage'
-import { ThemeProvider } from "@/components/ui/theme-provider"
+import { ThemeProvider } from '@/components/ui/theme-provider'
 import { ContestList } from './pages/ContestList'
 import { ContestPage } from './pages/ContestPage'
-import { Toaster } from "@/components/ui/sonner"
+import { Toaster } from '@/components/ui/sonner'
 
 function App() {
   return (
@@ -26,7 +26,7 @@ function App() {
         <Toaster />
       </div>
     </ThemeProvider>
-  );
+  )
 }
 
 export default App

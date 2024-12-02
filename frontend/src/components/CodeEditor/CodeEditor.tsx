@@ -1,9 +1,9 @@
-import AceEditor from 'react-ace';
-import 'ace-builds/src-noconflict/mode-python';
-import 'ace-builds/src-noconflict/theme-dracula';
+import AceEditor from 'react-ace'
+import 'ace-builds/src-noconflict/mode-python'
+import 'ace-builds/src-noconflict/theme-dracula'
 
 interface CodeEditorProps {
-  setCode: (code: string) => void;
+  setCode: (code: string) => void
 }
 
 export function CodeEditor(CEProps: CodeEditorProps) {
@@ -27,5 +27,5 @@ export function CodeEditor(CEProps: CodeEditorProps) {
       onChange={onChange}
       style={{ width: '100%', height: '510px' }}
     />
-  );
-};
+  )
+}

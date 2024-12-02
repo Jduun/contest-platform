@@ -1,7 +1,7 @@
-import axios, { AxiosError } from "axios";
-import { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
-import { Navbar } from "@/components/Navbar/Navbar";
+import axios, { AxiosError } from 'axios'
+import { useState, useEffect } from 'react'
+import { useNavigate } from 'react-router-dom'
+import { Navbar } from '@/components/Navbar/Navbar'
 import {
   Pagination,
   PaginationContent,
@@ -10,8 +10,8 @@ import {
   PaginationLink,
   PaginationNext,
   PaginationPrevious,
-} from "@/components/ui/pagination"
-import { ProblemCard } from "@/components/ProblemCard/ProblemCard"
+} from '@/components/ui/pagination'
+import { ProblemCard } from '@/components/ProblemCard/ProblemCard'
 import { useAtom } from 'jotai'
 import { usernameAtom } from '@/store/atoms'
 
@@ -35,56 +35,55 @@ export function ProblemList() {
 
   useEffect(() => {
     const getUserInfo = async () => {
-      const token = localStorage.getItem("token")
-      await axios.get<UserInfo>("http://localhost/api/users/me", {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      })
-      .then((response) => {
-        setUsername(response.data.username)
-      })
-      .catch((err: AxiosError) => {
-        navigate("/login")
-        return
-      })
+      const token = localStorage.getItem('token')
+      await axios
+        .get<UserInfo>('http://localhost/api/users/me', {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        })
+        .then((response) => {
+          setUsername(response.data.username)
+        })
+        .catch((err: AxiosError) => {
+          navigate('/login')
+          return
+        })
     }
     getUserInfo()
 
     const getProblems = async () => {
-      const token = localStorage.getItem("token")
-      await axios.get<Problem[]>("http://localhost/api/problems", {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-        params: {
-          offset: 0,
-          limit: 10,
-        }
-      })
-      .then((response) => {
-        console.log(response.data)
-        setProblems(response.data)
-      })
+      const token = localStorage.getItem('token')
+      await axios
+        .get<Problem[]>('http://localhost/api/problems', {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+          params: {
+            offset: 0,
+            limit: 10,
+          },
+        })
+        .then((response) => {
+          console.log(response.data)
+          setProblems(response.data)
+        })
     }
     getProblems()
   }, [])
-
 
   return (
     <div className="flex flex-col w-full max-w-[900px] mx-auto">
       <Navbar />
       <div>
-        {
-          problems.map((problem) => (
-            <ProblemCard
-              key={problem.id}
-              id={problem.id}
-              title={problem.title}
-              difficulty={problem.difficulty}
-            />
-          ))
-        }
+        {problems.map((problem) => (
+          <ProblemCard
+            key={problem.id}
+            id={problem.id}
+            title={problem.title}
+            difficulty={problem.difficulty}
+          />
+        ))}
       </div>
       <Pagination>
         <PaginationContent>
@@ -106,5 +105,5 @@ export function ProblemList() {
         </PaginationContent>
       </Pagination>
     </div>
-  );
+  )
 }
