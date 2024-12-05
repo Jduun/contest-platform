@@ -59,7 +59,6 @@ async def get_submission_by_id(
 ) -> Submission:
     query = select(Submission).filter_by(id=submission_id)
     res = await db_session.execute(query)
-    await db_session.commit()
     return res.scalars().first()
 
 

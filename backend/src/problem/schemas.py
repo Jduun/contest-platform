@@ -13,7 +13,7 @@ class ProblemAdd(BaseModel):
     memory_limit: int
     time_limit: int
     difficulty: Difficulty
-    is_in_contest: bool
+    is_public: bool
 
 
 class ProblemUpdate(ProblemAdd):

@@ -17,12 +17,15 @@ class Problem(Base):
     memory_limit: Mapped[int]
     time_limit: Mapped[int]
     difficulty: Mapped[Difficulty]
-    is_in_contest: Mapped[bool]
+    is_public: Mapped[bool]
     created_at: Mapped[timestamp]
     updated_at: Mapped[timestamp_updated]
 
     submissions: Mapped[list["Submission"]] = relationship(back_populates="problem")
     author: Mapped["User"] = relationship(back_populates="problems", lazy="joined")
+    contest_results: Mapped[list["ContestResult"]] = relationship(
+        back_populates="problem"
+    )
 
     def __str__(self):
         return self.title

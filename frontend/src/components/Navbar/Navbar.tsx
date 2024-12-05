@@ -50,7 +50,7 @@ export function Navbar() {
           </NavigationMenuItem>
           <NavigationMenuItem>
             <Avatar>
-              <AvatarImage src="https://github.com/shadcn.png" />
+              {<AvatarImage src="https://github.com/shadcn.png" />}
               <AvatarFallback>
                 {username.charAt(0).toUpperCase()}
               </AvatarFallback>

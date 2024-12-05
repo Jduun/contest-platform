@@ -1,3 +1,4 @@
+import uuid
 from datetime import timedelta
 from typing import Annotated, Any
 
@@ -71,3 +72,18 @@ async def get_me(
             detail="Неверное имя пользователя или пароль",
             headers={"WWW-Authenticate": "Bearer"},
         )
+
+
+@user_router.get("/{user_id}", response_model=UserResponse)
+async def get_user_by_id(
+    user_id: uuid.UUID,
+    user: Annotated[
+        User,
+        Security(
+            auth_service.get_current_user,
+            scopes=[Roles.admin, Roles.organizer, Roles.user],
+        ),
+    ],
+    db_session: DbSession,
+):
+    return await auth_service.get_user_by_id(db_session, user_id)

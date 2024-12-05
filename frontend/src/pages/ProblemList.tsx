@@ -82,6 +82,7 @@ export function ProblemList() {
             id={problem.id}
             title={problem.title}
             difficulty={problem.difficulty}
+            showScore={false}
           />
         ))}
       </div>

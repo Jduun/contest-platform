@@ -6,6 +6,8 @@ import { Navbar } from '@/components/Navbar/Navbar'
 import { ProblemCard } from '@/components/ProblemCard/ProblemCard'
 import moment from 'moment'
 import { toast } from 'sonner'
+import { Timer } from '@/components/Timer/Timer'
+import { Leaderboard } from '@/components/Leaderboard/Leaderboard'
 
 interface Contest {
   id: string
@@ -82,6 +84,7 @@ export function ContestPage() {
             Конец: {moment(contest?.end_time).format('LLL')}
             <br />
           </p>
+          <Timer endTime={contest?.end_time || ''} />
         </div>
       </div>
       <div className="w-full">
@@ -91,9 +94,18 @@ export function ContestPage() {
             id={problem.id}
             title={problem.title}
             difficulty={problem.difficulty}
+            showScore={true}
+            contest_id={id}
           />
         ))}
       </div>
+      <Leaderboard
+        key={contest?.id}
+        id={contest?.id}
+        name={contest?.name}
+        start_time={moment(contest?.start_time).format('LLL')}
+        end_time={moment(contest?.end_time).format('LLL')}
+      />
     </div>
   )
 }

@@ -1,3 +1,4 @@
+import uuid
 from datetime import datetime, timedelta, timezone
 from typing import Annotated, Any, Optional
 
@@ -58,6 +59,12 @@ async def add_user(db_session: AsyncSession, user_add: UserAdd) -> User:
         await db_session.commit()
     except SQLAlchemyError:
         raise UsernameAlreadyExistsError
+    return res.scalars().first()
+
+
+async def get_user_by_id(db_session: AsyncSession, user_id: uuid.UUID) -> Optional[User]:
+    query = select(User).filter_by(id=user_id)
+    res = await db_session.execute(query)
     return res.scalars().first()
 
 
