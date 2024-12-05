@@ -6,17 +6,24 @@ import {
   CardHeader,
   CardTitle,
 } from '@/components/ui/card'
+import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { Badge } from '@/components/ui/badge'
+import axios, { AxiosError } from 'axios'
+import { CheckIcon, Cross2Icon } from '@radix-ui/react-icons'
 
-interface Problem {
+interface ProblemCardProps {
   id: string
   title: string
   difficulty: string
+  showScore: boolean
+  contest_id: string | undefined
 }
 
-export function ProblemCard(problem: Problem) {
+export function ProblemCard(problemCardProps: ProblemCardProps) {
   const navigate = useNavigate()
+  const [isSolved, setIsSolved] = useState<boolean | null>(null)
+
   const difficultyToRussian: Record<string, string> = {
     easy: 'Легкая',
     medium: 'Средняя',
@@ -28,25 +35,64 @@ export function ProblemCard(problem: Problem) {
     hard: 'text-red-500',
   }
 
+  useEffect(() => {
+    const token = localStorage.getItem('token')
+
+    const getProblemIsSolved = async () => {
+      await axios
+        .get<boolean>(
+          `http://localhost/api/problems/${problemCardProps.id}/is-solved`,
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          },
+        )
+        .then((response) => {
+          setIsSolved(response.data)
+        })
+    }
+    getProblemIsSolved()
+  }, [])
+
   return (
     <div className="py-2 w-full">
       <Card
-        className="bg-primary hover:bg-secondary  cursor-pointer"
+        className="bg-primary hover:bg-secondary cursor-pointer flex justify-between"
         onClick={() => {
-          navigate(`/problems/${problem.id}`)
+          if (problemCardProps.contest_id === undefined) {
+            navigate(`/problems/${problemCardProps.id}`)
+          } else {
+            navigate(
+              `/contests/${problemCardProps.contest_id}/problems/${problemCardProps.id}`,
+            )
+          }
         }}
       >
         <CardHeader className="p-3">
-          <CardTitle>{problem.title}</CardTitle>
+          <CardTitle>{problemCardProps.title}</CardTitle>
           <CardDescription>
             <Badge
               variant="outline"
-              className={difficultyColors[problem.difficulty]}
+              className={difficultyColors[problemCardProps.difficulty]}
             >
-              {difficultyToRussian[problem.difficulty]}
+              {difficultyToRussian[problemCardProps.difficulty]}
             </Badge>
           </CardDescription>
         </CardHeader>
+        <div className="m-6">
+          {isSolved !== null ? (
+            <div className="w-5 h-5">
+              {isSolved ? (
+                <CheckIcon className="w-full h-full text-green-500" />
+              ) : (
+                <Cross2Icon className="w-full h-full text-red-500" />
+              )}
+            </div>
+          ) : (
+            <></>
+          )}
+        </div>
       </Card>
     </div>
   )

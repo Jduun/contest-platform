@@ -20,9 +20,10 @@ interface Problem {
 export function ProblemPage() {
   const navigate = useNavigate()
   const params = useParams()
-  const id = params.id
+  const problem_id = params.problem_id
+  const contest_id = params.contest_id
   const [problem, setProblem] = useState<Problem | null>(null)
-  const [submitResponse, setSubmitResponse] = useState<string>('')
+  const [submissionStatus, setSubmissionStatus] = useState<string>('')
   const [code, setCode] = useState<string>('')
   const [codeProcessing, setCodeProcessing] = useState<boolean>(false)
 
@@ -36,7 +37,7 @@ export function ProblemPage() {
     const getProblem = async () => {
       const token = localStorage.getItem('token')
       await axios
-        .get<Problem>(`http://localhost/api/problems/${id}`, {
+        .get<Problem>(`http://localhost/api/problems/${problem_id}`, {
           headers: {
             Authorization: `Bearer ${token}`,
           },
@@ -54,7 +55,7 @@ export function ProblemPage() {
   const submitCode = async () => {
     setCodeProcessing(true)
     if (code == '') {
-      setSubmitResponse('Напишите код')
+      setSubmissionStatus('Напишите код')
       setCodeProcessing(false)
       return
     }
@@ -78,23 +79,24 @@ export function ProblemPage() {
         const submissionId = response.data
         console.log('submission id: ' + submissionId)
         console.log(`Event http://localhost/api/submissions/${submissionId}`)
+        let submission_status = ''
         const eventSource = new EventSource(
           `http://localhost/api/submissions/${submissionId}`,
         )
         eventSource.onopen = () => {
           console.log('EventSource connected')
-          setSubmitResponse('')
+          setSubmissionStatus('')
         }
         eventSource.addEventListener('locationUpdate', function (event) {
-          console.log(event.data)
-          const newSubmitResponse = event.data
-          console.log('LocationUpdate', newSubmitResponse)
-          //setSubmitResponse(newSubmitResponse);
-          setSubmitResponse(event.data)
+          setSubmissionStatus(event.data)
+          submission_status = event.data
         })
         eventSource.onerror = (error) => {
-          setCodeProcessing(false)
           eventSource.close()
+          setCodeProcessing(false)
+          if (contest_id !== undefined) {
+            setPenaltyTime(submission_status)
+          }
         }
       })
       .catch((err: AxiosError) => {
@@ -104,9 +106,27 @@ export function ProblemPage() {
       })
   }
 
+  const setPenaltyTime = async (status: string) => {
+    const token = localStorage.getItem('token')
+    await axios.post(
+      `http://localhost/api/contests/${contest_id}/problems/${problem_id}/set-penalty-time`,
+      {
+        status: status,
+      },
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      },
+    )
+  }
+
   return (
     <div className="flex flex-col w-full max-w-[900px] mx-auto">
       <Navbar />
+
+      <>Контест: {contest_id}</>
+      <>Задача: {problem_id}</>
       <div className="prose dark:prose-invert w-full">
         <div>
           <h1 className="m-0 text-3xl">{problem?.title}</h1>
@@ -148,19 +168,19 @@ export function ProblemPage() {
       <div className="border">
         <CodeEditor setCode={setCode} />
       </div>
-      {submitResponse ? (
+      {submissionStatus ? (
         <p>
           Результат выполнения:
           <span
             className={`${
-              submitResponse === 'Accepted'
+              submissionStatus === 'Accepted'
                 ? 'text-green-500'
-                : submitResponse === 'Processing'
+                : submissionStatus === 'Processing'
                   ? 'text-yellow-500'
                   : 'text-red-500'
             } mx-2 font-medium`}
           >
-            {submitResponse}
+            {submissionStatus}
           </span>
         </p>
       ) : (

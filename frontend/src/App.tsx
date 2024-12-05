@@ -18,9 +18,13 @@ function App() {
             <Route path="/" element={<ProblemList />} />
             <Route path="/login" element={<LoginForm />} />
             <Route path="/signup" element={<SignUpForm />} />
-            <Route path="/problems/:id" element={<ProblemPage />} />
+            <Route path="/problems/:problem_id" element={<ProblemPage />} />
             <Route path="/contests" element={<ContestList />} />
-            <Route path="/contests/:id" element={<ContestPage />} />
+            {<Route path="/contests/:id" element={<ContestPage />} />}
+            <Route
+              path="/contests/:contest_id/problems/:problem_id"
+              element={<ProblemPage />}
+            />
           </Routes>
         </Router>
         <Toaster />
