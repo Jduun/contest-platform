@@ -18,9 +18,7 @@ problem_router = APIRouter(prefix="/problems", tags=["Problems"])
 
 
 @problem_router.get("/", response_model=list[ProblemResponse])
-async def get_problems(
-    offset: int,
-    limit: int,
+async def get_public_problems(
     user: Annotated[
         User,
         Security(
@@ -29,9 +27,11 @@ async def get_problems(
         ),
     ],
     db_session: DbSession,
+    offset: int = 0,
+    limit: int = 10,
 ):
     try:
-        problems = await problem_service.get_problems(db_session, offset, limit)
+        problems = await problem_service.get_public_problems(db_session, offset, limit)
     except OffsetAndLimitMustNotBeNegative:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
@@ -60,3 +60,35 @@ async def get_problem(
             detail="There is no problem with this id",
         )
     return problem
+
+
+"""
+@problem_router.get("/{problem_id}/score")
+async def get_problem(
+    problem_id: uuid.UUID,
+    user: Annotated[
+        User,
+        Security(
+            auth_service.get_current_user,
+            scopes=[Roles.admin, Roles.organizer, Roles.user],
+        ),
+    ],
+    db_session: DbSession,
+):
+    return await problem_service.get_problem_score(db_session, problem_id)
+"""
+
+
+@problem_router.get("/{problem_id}/is-solved")
+async def problem_is_solved(
+    problem_id: uuid.UUID,
+    user: Annotated[
+        User,
+        Security(
+            auth_service.get_current_user,
+            scopes=[Roles.admin, Roles.organizer, Roles.user],
+        ),
+    ],
+    db_session: DbSession,
+):
+    return await problem_service.problem_is_solved(db_session, user.id, problem_id)

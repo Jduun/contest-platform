@@ -45,13 +45,3 @@ async def submit_code(
         submission_service.submit_code_sse(db_session, submission_id),
         media_type="text/event-stream",
     )
-
-
-"""
-    user: Annotated[
-        User,
-        Security(
-            auth_service.get_current_user,
-            scopes=[Roles.admin, Roles.organizer, Roles.user],
-        ),
-    ],"""

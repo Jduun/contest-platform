@@ -174,7 +174,7 @@ class ProblemAdmin(ModelView, model=Problem):
         Problem.difficulty,
         Problem.memory_limit,
         Problem.time_limit,
-        Problem.is_in_contest,
+        Problem.is_public,
         Problem.created_at,
         Problem.updated_at,
     ]
@@ -187,13 +187,13 @@ class ProblemAdmin(ModelView, model=Problem):
         Problem.difficulty,
         Problem.memory_limit,
         Problem.time_limit,
-        Problem.is_in_contest,
+        Problem.is_public,
     ]
     column_searchable_list = [Problem.title, Problem.statement]
     column_sortable_list = [
         Problem.title,
         Problem.difficulty,
-        Problem.is_in_contest,
+        Problem.is_public,
         Problem.created_at,
         Problem.updated_at,
     ]

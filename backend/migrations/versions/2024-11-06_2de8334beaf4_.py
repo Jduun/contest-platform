@@ -133,7 +133,10 @@ def upgrade() -> None:
         sa.Column("user_id", sa.Uuid(), nullable=False),
         sa.Column("problem_id", sa.Uuid(), nullable=False),
         sa.Column(
-            "submitted_at", sa.DateTime(), server_default=sa.text("now()"), nullable=False
+            "submitted_at",
+            sa.DateTime(),
+            server_default=sa.text("now()"),
+            nullable=False,
         ),
         sa.ForeignKeyConstraint(
             ["problem_id"],

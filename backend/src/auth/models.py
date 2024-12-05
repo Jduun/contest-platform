@@ -30,6 +30,7 @@ class User(Base):
     role: Mapped["Role"] = relationship(back_populates="users", lazy="joined")
     submissions: Mapped[list["Submission"]] = relationship(back_populates="user")
     problems: Mapped[list["Problem"]] = relationship(back_populates="author")
+    contest_results: Mapped[list["ContestResult"]] = relationship(back_populates="user")
 
     def __str__(self):
         return self.username

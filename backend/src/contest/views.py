@@ -2,7 +2,7 @@ import uuid
 from datetime import datetime
 from typing import Annotated
 
-from fastapi import APIRouter, HTTPException, Security, status
+from fastapi import APIRouter, HTTPException, Security, status, Body
 
 import src.auth.service as auth_service
 import src.contest.service as contest_service
@@ -16,7 +16,7 @@ from src.contest.exceptions import (
     JoinContestError,
     UnjoinContestError,
 )
-from src.contest.schemas import ContestResponse
+from src.contest.schemas import ContestResponse, SubmissionStatus
 from src.problem.schemas import ProblemResponse
 
 contest_router = APIRouter(prefix="/contests", tags=["Contests"])
@@ -168,5 +168,46 @@ async def get_join_contest_status(
     return {
         "join status": await contest_service.get_join_contest_status(
             db_session, contest_id, user.id
+        )
+    }
+
+
+@contest_router.post("/{contest_id}/problems/{problem_id}/set-penalty-time")
+async def set_penalty_time(
+    contest_id: uuid.UUID,
+    problem_id: uuid.UUID,
+    user: Annotated[
+        User,
+        Security(
+            auth_service.get_current_user,
+            scopes=[Roles.admin, Roles.organizer, Roles.user],
+        ),
+    ],
+    db_session: DbSession,
+    submission_status: SubmissionStatus,
+):
+    return {
+        "penalty time": await contest_service.calculate_penalty_time(
+            db_session, contest_id, problem_id, user.id, submission_status.status
+        )
+    }
+
+
+@contest_router.get("/{contest_id}/leaderboard")
+async def get_leaderboard(
+    contest_id: uuid.UUID,
+    user: Annotated[
+        User,
+        Security(
+            auth_service.get_current_user,
+            scopes=[Roles.admin, Roles.organizer, Roles.user],
+        ),
+    ],
+    db_session: DbSession,
+):
+    return {
+        "leaderboard": await contest_service.get_contest_leaderboard(
+            db_session,
+            contest_id,
         )
     }
