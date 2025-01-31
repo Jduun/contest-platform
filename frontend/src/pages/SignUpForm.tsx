@@ -28,7 +28,7 @@ export function SignUpForm() {
       return
     }
     try {
-      const registerResponse = await axios.post(
+      await axios.post(
         'http://localhost/api/register',
         { username, password },
       )
@@ -47,7 +47,7 @@ export function SignUpForm() {
         },
       )
 
-      const { access_token, token_type } = loginResponse.data
+      const { access_token, token_type: _ } = loginResponse.data
       // Save the token to localStorage
       localStorage.setItem('token', `${access_token}`)
       navigate('/')
@@ -62,7 +62,7 @@ export function SignUpForm() {
         <CardHeader>
           <CardTitle className="text-2xl">Регистрация</CardTitle>
           <CardDescription>
-            Придумайте имя пользователя и пароль
+            Придумайте имя пользователя и пароль.
           </CardDescription>
         </CardHeader>
         <CardContent>
@@ -117,12 +117,15 @@ export function SignUpForm() {
             </Button>
           </div>
           <div className="mt-4 text-center text-sm">
-            У Вас уже есть аккаунт?{' '}
-          </div>
-          <div className="text-center text-sm">
+            <p>
+            Уже есть аккаунт?{' '}
             <Link to="/login" className="underline">
-              Войдите в аккаунт здесь
+              Войдите в аккаунт здесь!
             </Link>
+            </p>
+            <p>
+            Регистрируясь вы соглашаетесь с <Link to="" className="underline">условиями пользования</Link>.
+            </p>
           </div>
         </CardFooter>
       </Card>

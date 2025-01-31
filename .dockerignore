@@ -1,0 +1,7 @@
+docs/
+
+.env
+.env.*
+
+.vscode/
+.idea/

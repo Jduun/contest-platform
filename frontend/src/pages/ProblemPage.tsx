@@ -45,7 +45,7 @@ export function ProblemPage() {
         .then((response) => {
           setProblem(response.data)
         })
-        .catch((err: AxiosError) => {
+        .catch((_err: AxiosError) => {
           navigate('/')
         })
     }
@@ -91,7 +91,7 @@ export function ProblemPage() {
           setSubmissionStatus(event.data)
           submission_status = event.data
         })
-        eventSource.onerror = (error) => {
+        eventSource.onerror = (_error) => {
           eventSource.close()
           setCodeProcessing(false)
           if (contest_id !== undefined) {
@@ -99,7 +99,7 @@ export function ProblemPage() {
           }
         }
       })
-      .catch((err: AxiosError) => {
+      .catch((_err: AxiosError) => {
         setCodeProcessing(false)
         navigate('/')
         return
@@ -124,9 +124,10 @@ export function ProblemPage() {
   return (
     <div className="flex flex-col w-full max-w-[900px] mx-auto">
       <Navbar />
-
-      <>Контест: {contest_id}</>
-      <>Задача: {problem_id}</>
+      {
+      //<>Контест: {contest_id}</>
+      //<>Задача: {problem_id}</>
+      }
       <div className="prose dark:prose-invert w-full">
         <div>
           <h1 className="m-0 text-3xl">{problem?.title}</h1>

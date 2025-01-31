@@ -45,7 +45,7 @@ export function ContestPage() {
           setContest(response.data)
           console.log(response.status)
         })
-        .catch((err: AxiosError) => {
+        .catch((_err: AxiosError) => {
           navigate('/contests')
         })
     }

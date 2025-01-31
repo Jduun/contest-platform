@@ -2,30 +2,9 @@ import axios, { AxiosError } from 'axios'
 import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { Navbar } from '@/components/Navbar/Navbar'
-import {
-  Pagination,
-  PaginationContent,
-  PaginationEllipsis,
-  PaginationItem,
-  PaginationLink,
-  PaginationNext,
-  PaginationPrevious,
-} from '@/components/ui/pagination'
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-  AlertDialogTrigger,
-} from '@/components/ui/alert-dialog'
 import { useAtom } from 'jotai'
 import { usernameAtom } from '@/store/atoms'
 import { ContestCard } from '@/components/ContestCard/ContestCard'
-import { Button } from '@/components/ui/button'
 import moment from 'moment'
 
 interface UserInfo {
@@ -41,7 +20,7 @@ interface Contest {
 
 export function ContestList() {
   const navigate = useNavigate()
-  const [username, setUsername] = useAtom(usernameAtom)
+  const [_username, setUsername] = useAtom(usernameAtom)
   const [contests, setContests] = useState<Contest[] | []>([])
 
   useEffect(() => {
@@ -56,7 +35,7 @@ export function ContestList() {
         .then((response) => {
           setUsername(response.data.username)
         })
-        .catch((err: AxiosError) => {
+        .catch((_err: AxiosError) => {
           navigate('/login')
           return
         })
@@ -97,7 +76,8 @@ export function ContestList() {
           />
         ))}
       </div>
-      <Pagination>
+      {/*
+        <Pagination>
         <PaginationContent>
           <PaginationItem>
             <PaginationPrevious href="#" />
@@ -116,6 +96,7 @@ export function ContestList() {
           </PaginationItem>
         </PaginationContent>
       </Pagination>
+  */}
     </div>
   )
 }

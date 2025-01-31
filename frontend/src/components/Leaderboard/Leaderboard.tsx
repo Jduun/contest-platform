@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import axios, { AxiosError } from 'axios'
+import axios from 'axios'
 import {
   Table,
   TableBody,
@@ -36,7 +36,6 @@ export function Leaderboard(contest: Contest) {
   const [users, setUsers] = useState<Record<string, User>>({})
   const [currentUser, setCurrentUser] = useState<User | null>(null)
   const [loading, setLoading] = useState<boolean>(true)
-  const [error, setError] = useState<string | null>(null)
   const [maxTasks, setMaxTasks] = useState<number>(0)
 
   useEffect(() => {
@@ -88,7 +87,7 @@ export function Leaderboard(contest: Contest) {
         )
         setUsers(usersData)
       } catch (error) {
-        const axiosError = error as AxiosError
+
       } finally {
         setLoading(false)
       }
@@ -101,10 +100,6 @@ export function Leaderboard(contest: Contest) {
 
   if (loading) {
     return <p>Loading leaderboard...</p>
-  }
-
-  if (error) {
-    return <p>Error: {error}</p>
   }
 
   return (

@@ -1,15 +1,13 @@
 import {
   Card,
-  CardContent,
   CardDescription,
-  CardFooter,
   CardHeader,
   CardTitle,
 } from '@/components/ui/card'
 import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { Badge } from '@/components/ui/badge'
-import axios, { AxiosError } from 'axios'
+import axios from 'axios'
 import { CheckIcon, Cross2Icon } from '@radix-ui/react-icons'
 
 interface ProblemCardProps {
