@@ -9,6 +9,6 @@ RUN apt-get update && \
 COPY pyproject.toml poetry.lock ./
 
 RUN poetry config virtualenvs.create false \
-    && poetry install --no-root --no-interaction --no-ansi --without dev
+    && poetry install --no-root --without dev
 
 COPY . /backend

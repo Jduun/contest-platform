@@ -6,4 +6,9 @@ docs/
 .vscode/
 .idea/
 
-trash/
+build.sh
+run.sh
+README.md
+LICENSE
+.git
+.gitignore

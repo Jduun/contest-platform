@@ -24,7 +24,7 @@ It is a web platform designed for developers and enthusiasts to engage in coding
 - [ ] Submission History
 - [ ] Telegram Bot for notifications
 - [ ] Problem Statements in Markdown format
-- [ ] Request caching
+- [ ] Request caching with Redis
 
 ## Technologies
 1. Backend: Python, FastAPI, PostgreSQL, SQLAlchemy, Alebmic, Docker, Nginx
@@ -36,7 +36,7 @@ It is a web platform designed for developers and enthusiasts to engage in coding
     git clone https://github.com/Jduun/contest-platform.git
     ```
 
-2. First of all you need to install and setup [Judge0](https://github.com/judge0/judge0). Judge0 is an open-source online code execution system.
+2. First of all you need to install and setup [Judge0](https://github.com/judge0/judge0). Judge0 is an open-source online code execution system. You can also use Judge 0 via [RapidAPI](https://rapidapi.com/dishis-technologies-judge0/api/judge029/playground) (but there will be a limited number of requests per day).
 
 3. Navigate to the project folder:
     ```
@@ -47,7 +47,7 @@ It is a web platform designed for developers and enthusiasts to engage in coding
     ```
     cp .env.example .env
     ```
-    Change the values of the environment variables to your own.
+    Open .env file using text editor and change the values of the environment variables to your own.
 
 5. Build project:
     ```
