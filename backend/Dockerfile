@@ -2,8 +2,9 @@ FROM python:3.10-slim
 
 WORKDIR /backend
 
-RUN apt-get update && rm -rf /var/lib/apt/lists/*
-RUN pip install --no-cache-dir poetry
+RUN apt-get update && \
+    rm -rf /var/lib/apt/lists/* && \
+    pip install --no-cache-dir poetry
 
 COPY pyproject.toml poetry.lock ./
 

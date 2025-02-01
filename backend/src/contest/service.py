@@ -1,22 +1,22 @@
 import uuid
 from datetime import datetime
 
-from sqlalchemy import select, insert, delete, update, func, case, asc, desc
+from fastapi.encoders import jsonable_encoder
+from sqlalchemy import asc, case, delete, desc, func, insert, select, update
+from sqlalchemy.dialects.postgresql import array_agg
 from sqlalchemy.exc import SQLAlchemyError
 from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy.dialects.postgresql import array_agg
-from fastapi.encoders import jsonable_encoder
 
+import src.problem.service as problem_service
 from src.contest.exceptions import (
-    OffsetAndLimitMustNotBeNegative,
     ContestDoesNotExistError,
     ContestProblemDoesNotExistError,
     JoinContestError,
+    OffsetAndLimitMustNotBeNegative,
     UnjoinContestError,
 )
-from src.contest.models import Contest, ContestProblem, ContestUser, ContestResult
+from src.contest.models import Contest, ContestProblem, ContestResult, ContestUser
 from src.problem.models import Problem
-import src.problem.service as problem_service
 
 
 async def get_contests(

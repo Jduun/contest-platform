@@ -26,7 +26,7 @@ class Settings(BaseSettings):
 
     @property
     def code_exe_url(self):
-        return f"http://{self.CODE_EXE_HOST}:{self.CODE_EXE_PORT}"
+        return f"https://{self.CODE_EXE_HOST}:{self.CODE_EXE_PORT}"
 
 
 settings = Settings()

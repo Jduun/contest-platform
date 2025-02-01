@@ -1,18 +1,18 @@
 import uuid
-from typing import Optional
 from datetime import datetime
+from typing import Optional
 
 from sqlalchemy import select
 from sqlalchemy.exc import SQLAlchemyError
 from sqlalchemy.ext.asyncio import AsyncSession
 
+import src.contest.service as contest_service
+from src.contest.models import Contest, ContestProblem
 from src.problem.exceptions import (
     OffsetAndLimitMustNotBeNegative,
     ProblemDoesNotExistError,
 )
 from src.problem.models import Problem
-from src.contest.models import ContestProblem, Contest
-import src.contest.service as contest_service
 from src.submission.models import Submission
 
 

@@ -2,21 +2,21 @@ import uuid
 from datetime import datetime
 from typing import Annotated
 
-from fastapi import APIRouter, HTTPException, Security, status, Body
+from fastapi import APIRouter, Body, HTTPException, Security, status
 
 import src.auth.service as auth_service
 import src.contest.service as contest_service
 from src.auth.models import User
 from src.auth.roles import Roles
-from src.database import DbSession
 from src.contest.exceptions import (
-    OffsetAndLimitMustNotBeNegative,
     ContestDoesNotExistError,
     ContestProblemDoesNotExistError,
     JoinContestError,
+    OffsetAndLimitMustNotBeNegative,
     UnjoinContestError,
 )
 from src.contest.schemas import ContestResponse, SubmissionStatus
+from src.database import DbSession
 from src.problem.schemas import ProblemResponse
 
 contest_router = APIRouter(prefix="/contests", tags=["Contests"])

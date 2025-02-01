@@ -1,4 +1,3 @@
-import math
 import asyncio
 import json
 import uuid
@@ -6,13 +5,13 @@ from typing import Any
 
 import requests
 from sqlalchemy import insert, select, update
-from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.exc import SQLAlchemyError
+from sqlalchemy.ext.asyncio import AsyncSession
 
 import src.problem.service as problem_service
-from src.submission.exceptions import SubmissionDoesNotExistError
 from src.config import settings
 from src.problem.models import Problem
+from src.submission.exceptions import SubmissionDoesNotExistError
 from src.submission.models import Submission
 from src.submission.schemas import SubmissionAdd
 
@@ -80,9 +79,19 @@ async def submit_code_sse(db_session: AsyncSession, submission_id: uuid.UUID):
                 "memory_limit": problem.memory_limit * 1024,
             }
         )
+
+    headers = {
+        "x-rapidapi-key": "e6c8e8a7ffmsh36e507f5be29409p15df08jsnd919ca69ddc0",
+        "x-rapidapi-host": "judge029.p.rapidapi.com",
+        "Content-Type": "application/json",
+    }
+
     submissions_batch_response = requests.post(
-        f"{settings.code_exe_url}/submissions/batch", json={"submissions": submissions}
+        f"{settings.code_exe_url}/submissions/batch",
+        json={"submissions": submissions},
+        headers=headers,
     )
+
     submission_tokens = [i["token"] for i in submissions_batch_response.json()]
 
     PROCESSING_STATUS_ID = 1
@@ -94,6 +103,7 @@ async def submit_code_sse(db_session: AsyncSession, submission_id: uuid.UUID):
         submissions_response = requests.get(
             f"{settings.code_exe_url}/submissions/batch",
             params={"tokens": ",".join(submission_tokens)},
+            headers=headers,
         )
         submissions_info = submissions_response.json()
 
