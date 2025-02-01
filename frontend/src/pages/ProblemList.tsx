@@ -30,7 +30,7 @@ interface Problem {
 
 export function ProblemList() {
   const navigate = useNavigate()
-  const [username, setUsername] = useAtom(usernameAtom)
+  const [_username, setUsername] = useAtom(usernameAtom)
   const [problems, setProblems] = useState<Problem[] | []>([])
 
   useEffect(() => {
@@ -45,7 +45,7 @@ export function ProblemList() {
         .then((response) => {
           setUsername(response.data.username)
         })
-        .catch((err: AxiosError) => {
+        .catch((_err: AxiosError) => {
           navigate('/login')
           return
         })
@@ -80,6 +80,7 @@ export function ProblemList() {
           <ProblemCard
             key={problem.id}
             id={problem.id}
+            contest_id={undefined}
             title={problem.title}
             difficulty={problem.difficulty}
             showScore={false}

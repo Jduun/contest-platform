@@ -34,8 +34,7 @@ export function LoginForm() {
         },
       })
 
-      const { access_token, token_type } = response.data
-      // Save the token to localStorage
+      const { access_token, token_type: _ } = response.data
       localStorage.setItem('token', `${access_token}`)
       navigate('/')
     } catch (err: any) {
