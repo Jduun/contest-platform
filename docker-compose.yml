@@ -14,7 +14,7 @@ services:
       - db
     entrypoint: /backend/entrypoint.sh
     networks:
-      - app-network 
+      - app-network
     
   frontend:
     build:
@@ -55,8 +55,8 @@ services:
       - "80:80"
       - "443:443"
     volumes:
-      - './nginx.conf:/etc/nginx/nginx.conf'
-      - '/etc/letsencrypt:/etc/letsencrypt'
+      - "./nginx.conf:/etc/nginx/nginx.conf"
+      - "/etc/letsencrypt:/etc/letsencrypt"
     depends_on:
       - backend
       - frontend
