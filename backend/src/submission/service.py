@@ -85,7 +85,6 @@ async def submit_code_sse(db_session: AsyncSession, submission_id: uuid.UUID):
         "x-rapidapi-host": "judge029.p.rapidapi.com",
         "Content-Type": "application/json",
     }
-
     submissions_batch_response = requests.post(
         f"{settings.code_exe_url}/submissions/batch",
         json={"submissions": submissions},
@@ -128,8 +127,10 @@ async def submit_code_sse(db_session: AsyncSession, submission_id: uuid.UUID):
                     status_description = f"Test {i[2] + 1}: {i[1]}"
                     stderr = curr_stderr
                     break
-
-        yield f"event: locationUpdate\ndata: {status_description}{'. ' + curr_stderr if curr_stderr else ''}\n\n"
+        
+        if not stderr:
+            stderr = ""
+        yield f"event: locationUpdate\ndata: {status_description}. {stderr}\n\n"
         await asyncio.sleep(1)
 
     query = (
