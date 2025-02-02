@@ -1,19 +1,32 @@
 import asyncio
+import base64
 import json
+import os
 import uuid
 from typing import Any
 
 import requests
 from sqlalchemy import insert, select, update
-from sqlalchemy.exc import SQLAlchemyError
 from sqlalchemy.ext.asyncio import AsyncSession
 
 import src.problem.service as problem_service
 from src.config import settings
 from src.problem.models import Problem
-from src.submission.exceptions import SubmissionDoesNotExistError
 from src.submission.models import Submission
 from src.submission.schemas import SubmissionAdd
+
+
+def string_to_base64(string: str) -> str:
+    string_bytes = string.encode("utf-8")
+    base64_bytes = base64.b64encode(string_bytes)
+    base64_string = base64_bytes.decode("utf-8")
+    return base64_string
+
+
+def base64_to_string(base64_string: str) -> str:
+    base64_bytes = base64.b64decode(base64_string)
+    decoded_string = base64_bytes.decode("utf-8")
+    return decoded_string
 
 
 def get_languages():
@@ -81,10 +94,11 @@ async def submit_code_sse(db_session: AsyncSession, submission_id: uuid.UUID):
         )
 
     headers = {
-        "x-rapidapi-key": "e6c8e8a7ffmsh36e507f5be29409p15df08jsnd919ca69ddc0",
-        "x-rapidapi-host": "judge029.p.rapidapi.com",
+        "x-rapidapi-key": os.getenv("RAPIDAPI_KEY"),
+        "x-rapidapi-host": os.getenv("RAPIDAPI_HOST"),
         "Content-Type": "application/json",
     }
+
     submissions_batch_response = requests.post(
         f"{settings.code_exe_url}/submissions/batch",
         json={"submissions": submissions},
@@ -101,7 +115,7 @@ async def submit_code_sse(db_session: AsyncSession, submission_id: uuid.UUID):
     while status_id < ACCEPTED_STATUS_ID:
         submissions_response = requests.get(
             f"{settings.code_exe_url}/submissions/batch",
-            params={"tokens": ",".join(submission_tokens)},
+            params={"tokens": ",".join(submission_tokens), "base64_encoded": "true"},
             headers=headers,
         )
         submissions_info = submissions_response.json()
@@ -127,12 +141,11 @@ async def submit_code_sse(db_session: AsyncSession, submission_id: uuid.UUID):
                     status_description = f"Test {i[2] + 1}: {i[1]}"
                     stderr = curr_stderr
                     break
-        
-        if not stderr:
-            stderr = ""
-        yield f"event: locationUpdate\ndata: {status_description}. {stderr}\n\n"
-        await asyncio.sleep(1)
 
+        yield f"event: locationUpdate\ndata: {status_description}{'. ' + base64_to_string(stderr) if stderr else ''}\n\n"
+        await asyncio.sleep(5)
+
+    stderr = base64_to_string(stderr) if stderr else ""
     query = (
         update(Submission)
         .filter_by(id=submission_id)
