@@ -15,6 +15,8 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from '@/components/ui/popover'
+import { useAtom } from 'jotai'
+import { programmingLanguageIdAtom } from '@/store/atoms'
 
 const languages = [
   {
@@ -69,7 +71,12 @@ const languages = [
 
 export function Combobox() {
   const [open, setOpen] = React.useState(false)
-  const [value, setValue] = React.useState('')
+  const [programmingLanguageId, setProgrammingLanguageId] = useAtom(programmingLanguageIdAtom)
+  
+  React.useEffect(() => {
+      setProgrammingLanguageId(localStorage.getItem('programmingLanguageId') || '71')
+    }, []
+  )
 
   return (
     <Popover open={open} onOpenChange={setOpen}>
@@ -80,8 +87,8 @@ export function Combobox() {
           aria-expanded={open}
           className="w-[200px] justify-between"
         >
-          {value
-            ? languages.find((language) => language.value === value)?.label
+          {programmingLanguageId
+            ? languages.find((language) => language.value === programmingLanguageId)?.label
             : 'Выберите язык...'}
           <ChevronsUpDown className="opacity-50" />
         </Button>
@@ -97,7 +104,8 @@ export function Combobox() {
                   key={language.value}
                   value={language.value}
                   onSelect={(currentValue) => {
-                    setValue(currentValue === value ? '' : currentValue)
+                    setProgrammingLanguageId(currentValue === programmingLanguageId ? '' : currentValue)
+                    localStorage.setItem('programmingLanguageId', currentValue === programmingLanguageId ? '' : currentValue)
                     setOpen(false)
                   }}
                 >
@@ -105,7 +113,7 @@ export function Combobox() {
                   <Check
                     className={cn(
                       'ml-auto',
-                      value === language.value ? 'opacity-100' : 'opacity-0',
+                      programmingLanguageId === language.value ? 'opacity-100' : 'opacity-0',
                     )}
                   />
                 </CommandItem>

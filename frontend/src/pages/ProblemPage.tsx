@@ -7,6 +7,8 @@ import { CodeEditor } from '@/components/CodeEditor/CodeEditor'
 import { Combobox } from '@/components/Combobox/Combobox'
 import { Button } from '@/components/ui/button'
 import { Loader2 } from 'lucide-react'
+import { useAtom } from 'jotai'
+import { programmingLanguageIdAtom } from '@/store/atoms'
 
 interface Problem {
   id: string
@@ -26,6 +28,7 @@ export function ProblemPage() {
   const [submissionStatus, setSubmissionStatus] = useState<string>('')
   const [code, setCode] = useState<string>('')
   const [codeProcessing, setCodeProcessing] = useState<boolean>(false)
+  const [programmingLanguageId, _setProgrammingLanguageId] = useAtom(programmingLanguageIdAtom)
 
   const difficultyToRussian: Record<string, string> = {
     easy: 'Легкая',
@@ -66,7 +69,7 @@ export function ProblemPage() {
         {
           code: code,
           problem_id: problem?.id,
-          language_id: 71,
+          language_id: programmingLanguageId,
         },
         {
           headers: {
