@@ -9,7 +9,7 @@ import src.auth.service as auth_service
 from src.auth.exceptions import CredentialsError, UsernameAlreadyExistsError
 from src.auth.models import User
 from src.auth.roles import Roles
-from src.auth.schemas import Token, UserAdd, UserLogin, UserResponse
+from src.auth.schemas import Token, UserAdd, UserLogin, UserResponse, ProfileResponse
 from src.config import settings
 from src.database import DbSession
 
@@ -87,3 +87,18 @@ async def get_user_by_id(
     db_session: DbSession,
 ):
     return await auth_service.get_user_by_id(db_session, user_id)
+
+
+@user_router.get("/profile/{username}", response_model=ProfileResponse)
+async def get_profile_by_username(
+    username: str,
+    user: Annotated[
+        User,
+        Security(
+            auth_service.get_current_user,
+            scopes=[Roles.admin, Roles.organizer, Roles.user],
+        ),
+    ],
+    db_session: DbSession,
+):
+    return await auth_service.get_profile_by_username(db_session, username)

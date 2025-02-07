@@ -9,7 +9,6 @@ from src.models import Difficulty
 class ProblemAdd(BaseModel):
     title: str
     statement: str
-    tests: str
     memory_limit: int
     time_limit: int
     difficulty: Difficulty
