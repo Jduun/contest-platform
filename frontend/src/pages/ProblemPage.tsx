@@ -4,11 +4,12 @@ import { useNavigate } from 'react-router-dom'
 import axios, { AxiosError } from 'axios'
 import { Navbar } from '@/components/Navbar/Navbar'
 import { CodeEditor } from '@/components/CodeEditor/CodeEditor'
-import { Combobox } from '@/components/Combobox/Combobox'
+import { ProgrammingLanguageCombobox } from '@/components/Combobox/ProgrammingLanguageCombobox'
 import { Button } from '@/components/ui/button'
 import { Loader2 } from 'lucide-react'
 import { useAtom } from 'jotai'
 import { programmingLanguageIdAtom } from '@/store/atoms'
+import { SubmissionList } from '@/components/SubmissionList/SubmissionList'
 
 interface Problem {
   id: string
@@ -24,11 +25,14 @@ export function ProblemPage() {
   const params = useParams()
   const problem_id = params.problem_id
   const contest_id = params.contest_id
+
   const [problem, setProblem] = useState<Problem | null>(null)
   const [submissionStatus, setSubmissionStatus] = useState<string>('')
   const [code, setCode] = useState<string>('')
   const [codeProcessing, setCodeProcessing] = useState<boolean>(false)
-  const [programmingLanguageId, _setProgrammingLanguageId] = useAtom(programmingLanguageIdAtom)
+  const [programmingLanguageId, _setProgrammingLanguageId] = useAtom(
+    programmingLanguageIdAtom,
+  )
 
   const difficultyToRussian: Record<string, string> = {
     easy: 'Легкая',
@@ -128,8 +132,8 @@ export function ProblemPage() {
     <div className="flex flex-col w-full max-w-[900px] mx-auto">
       <Navbar />
       {
-      //<>Контест: {contest_id}</>
-      //<>Задача: {problem_id}</>
+        //<>Constest: {contest_id}</>
+        //<>Problem: {problem_id}</>
       }
       <div className="prose dark:prose-invert w-full">
         <div>
@@ -148,7 +152,7 @@ export function ProblemPage() {
       </div>
       <div className="flex justify-between">
         <div className="py-1">
-          <Combobox />
+          <ProgrammingLanguageCombobox />
         </div>
         <div>
           {codeProcessing ? (
@@ -170,7 +174,7 @@ export function ProblemPage() {
         </div>
       </div>
       <div className="border">
-        <CodeEditor setCode={setCode} />
+        <CodeEditor code={code} setCode={setCode} />
       </div>
       {submissionStatus ? (
         <p>
@@ -190,6 +194,15 @@ export function ProblemPage() {
       ) : (
         <></>
       )}
+      <div>
+        <div className="py-4">
+          {problem_id !== undefined ? (
+            <SubmissionList problem_id={problem_id} setCode={setCode} />
+          ) : (
+            <></>
+          )}
+        </div>
+      </div>
     </div>
   )
 }

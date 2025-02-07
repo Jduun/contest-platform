@@ -6,7 +6,6 @@ import {
 } from '@/components/ui/card'
 import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { Badge } from '@/components/ui/badge'
 import axios from 'axios'
 import { CheckIcon, Cross2Icon } from '@radix-ui/react-icons'
 
@@ -23,9 +22,9 @@ export function ProblemCard(problemCardProps: ProblemCardProps) {
   const [isSolved, setIsSolved] = useState<boolean | null>(null)
 
   const difficultyToRussian: Record<string, string> = {
-    easy: 'Легкая',
-    medium: 'Средняя',
-    hard: 'Сложная',
+    easy: 'Easy',
+    medium: 'Medium',
+    hard: 'Hard',
   }
   const difficultyColors: Record<string, string> = {
     easy: 'text-green-500',
@@ -54,7 +53,7 @@ export function ProblemCard(problemCardProps: ProblemCardProps) {
   }, [])
 
   return (
-    <div className="py-2 w-full">
+    <div className="py-1 w-full">
       <Card
         className="bg-primary hover:bg-secondary cursor-pointer flex justify-between"
         onClick={() => {
@@ -69,18 +68,15 @@ export function ProblemCard(problemCardProps: ProblemCardProps) {
       >
         <CardHeader className="p-3">
           <CardTitle>{problemCardProps.title}</CardTitle>
-          <CardDescription>
-            <Badge
-              variant="outline"
-              className={difficultyColors[problemCardProps.difficulty]}
-            >
-              {difficultyToRussian[problemCardProps.difficulty]}
-            </Badge>
+          <CardDescription
+            className={difficultyColors[problemCardProps.difficulty]}
+          >
+            {difficultyToRussian[problemCardProps.difficulty]}
           </CardDescription>
         </CardHeader>
         <div className="m-6">
           {isSolved !== null ? (
-            <div className="w-5 h-5">
+            <div className="w-4 h-4">
               {isSolved ? (
                 <CheckIcon className="w-full h-full text-green-500" />
               ) : (

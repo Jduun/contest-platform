@@ -9,7 +9,6 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { useAtom } from 'jotai'
 import { usernameAtom } from '@/store/atoms'
 
-
 export function Navbar() {
   const [username, _setUsername] = useAtom(usernameAtom)
 
@@ -19,10 +18,10 @@ export function Navbar() {
       <NavigationMenu>
         <NavigationMenuList className="flex space-x-6">
           <NavigationMenuItem>
-            <Link to="/">Задачи</Link>
+            <Link to="/">Problems</Link>
           </NavigationMenuItem>
           <NavigationMenuItem>
-            <Link to="/contests">Контесты</Link>
+            <Link to="/contests">Contests</Link>
           </NavigationMenuItem>
         </NavigationMenuList>
       </NavigationMenu>
@@ -34,12 +33,12 @@ export function Navbar() {
             <ModeToggle />
           </NavigationMenuItem>
           <NavigationMenuItem>
-            <Avatar>
-              {<AvatarImage src="https://github.com/shadcn.png" />}
-              <AvatarFallback>
-                {username.charAt(0).toUpperCase()}
-              </AvatarFallback>
-            </Avatar>
+            <Link to={`/users/${username}`}>
+              <Avatar>
+                <AvatarImage src="https://github.com/shadcn.png" />
+                <AvatarFallback>{username.charAt(0)}</AvatarFallback>
+              </Avatar>
+            </Link>
           </NavigationMenuItem>
         </NavigationMenuList>
       </NavigationMenu>

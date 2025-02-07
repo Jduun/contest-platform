@@ -68,6 +68,9 @@ export function ProblemList() {
           console.log(response.data)
           setProblems(response.data)
         })
+        .catch((err: AxiosError) => {
+          console.log(err)
+        })
     }
     getProblems()
   }, [])

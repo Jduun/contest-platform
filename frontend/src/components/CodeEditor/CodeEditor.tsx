@@ -1,28 +1,32 @@
 import AceEditor from 'react-ace'
 import 'ace-builds/src-noconflict/mode-python'
 import 'ace-builds/src-noconflict/theme-dracula'
-import 'ace-builds/src-noconflict/theme-chrome';
+import 'ace-builds/src-noconflict/theme-chrome'
 import 'ace-builds/src-noconflict/theme-crimson_editor'
 import 'ace-builds/src-noconflict/theme-solarized_light'
-
+import { useTheme } from '@/components/ui/theme-provider'
 
 interface CodeEditorProps {
+  code: string
   setCode: (code: string) => void
 }
 
-export function CodeEditor(CEProps: CodeEditorProps) {
+export function CodeEditor({ code, setCode }: CodeEditorProps) {
+  const { theme, setTheme: _ } = useTheme()
+
   function onChange(newValue: string) {
-    CEProps.setCode(newValue)
+    setCode(newValue)
   }
 
   return (
     <AceEditor
       mode="python"
-      //theme="dracula"
+      theme={theme === 'light' ? 'chrome' : 'dracula'}
       name="chrome"
       fontSize={16}
       editorProps={{ $blockScrolling: true }}
       //value={CEProps.code}
+      value={code}
       setOptions={{
         wrap: true,
         showLineNumbers: true,

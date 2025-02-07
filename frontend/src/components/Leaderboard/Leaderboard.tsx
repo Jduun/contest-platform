@@ -87,7 +87,6 @@ export function Leaderboard(contest: Contest) {
         )
         setUsers(usersData)
       } catch (error) {
-
       } finally {
         setLoading(false)
       }
