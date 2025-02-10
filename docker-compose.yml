@@ -63,6 +63,22 @@ services:
     networks:
       - app-network
 
+  minio:
+    image: minio/minio:latest
+    container_name: minio
+    restart: always
+    ports:
+      - "${MINIO_PORT}:${MINIO_PORT}"
+      - "${MINIO_WEB_PORT}:${MINIO_WEB_PORT}"
+    environment:
+      MINIO_ROOT_USER: "${MINIO_ACCESS_KEY}"
+      MINIO_ROOT_PASSWORD: "${MINIO_SECRET_KEY}"
+    volumes:
+      - ${MINIO_PATH}:/${MINIO_PATH}
+    command: server --console-address ":${MINIO_WEB_PORT}" ${MINIO_PATH}
+    networks:
+      - app-network
+
 networks:
   app-network:
     driver: bridge

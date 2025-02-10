@@ -25,7 +25,6 @@ export function CodeEditor({ code, setCode }: CodeEditorProps) {
       name="chrome"
       fontSize={16}
       editorProps={{ $blockScrolling: true }}
-      //value={CEProps.code}
       value={code}
       setOptions={{
         wrap: true,

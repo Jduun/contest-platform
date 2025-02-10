@@ -75,7 +75,9 @@ export function SubmissionList({ problem_id, setCode }: SubmissionListProps) {
               <TableRow>
                 <TableHead className="font-bold">Status</TableHead>
                 <TableHead className="font-bold">Language</TableHead>
-                <TableHead className="text-right font-bold">Submitted at</TableHead>
+                <TableHead className="text-right font-bold">
+                  Submitted at
+                </TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -86,12 +88,11 @@ export function SubmissionList({ problem_id, setCode }: SubmissionListProps) {
                     submission.status === 'Accepted'
                       ? 'text-green-500'
                       : submission.status === 'Processing'
-                          ? 'text-yellow-500'
-                          : 'text-red-500'
-                      } font-bold cursor-pointer`
-                  }
+                        ? 'text-yellow-500'
+                        : 'text-red-500'
+                  } font-bold cursor-pointer`}
                   onClick={() => {
-                    console.log("click")
+                    console.log('click')
                     setCode(submission.code)
                     console.log(submission.code)
                   }}
