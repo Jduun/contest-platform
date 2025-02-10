@@ -1,11 +1,11 @@
-import math
 import asyncio
 import base64
 import json
+import math
 import os
 import uuid
-from typing import Any
 from datetime import datetime
+from typing import Any
 
 import requests
 from sqlalchemy import insert, select, update
@@ -13,12 +13,12 @@ from sqlalchemy.exc import SQLAlchemyError
 from sqlalchemy.ext.asyncio import AsyncSession
 
 import src.problem.service as problem_service
-from src.config import settings
 from src.auth.models import Profile
+from src.config import settings
 from src.problem.models import Problem
+from src.submission.exceptions import OffsetAndLimitMustNotBeNegative
 from src.submission.models import Submission
 from src.submission.schemas import SubmissionAdd
-from src.submission.exceptions import OffsetAndLimitMustNotBeNegative
 
 
 def string_to_base64(string: str) -> str:
@@ -69,10 +69,7 @@ async def add_submission(
     submission_query_result = await db_session.execute(add_submission_query)
     current_year = str(datetime.today().year)
     current_date = datetime.today().strftime("%Y-%m-%d")
-    get_user_profile_query = (
-        select(Profile)
-        .filter_by(id=user_id)
-    )
+    get_user_profile_query = select(Profile).filter_by(id=user_id)
     get_user_profile_query_result = await db_session.execute(get_user_profile_query)
     user_profile = get_user_profile_query_result.scalars().first()
     acitivity_calendar = user_profile.activity_calendar
@@ -86,15 +83,11 @@ async def add_submission(
             today_activity_exist = True
             break
     if not today_activity_exist:
-        acitivity_calendar[current_year].append({
-            "date": current_date,
-            "count": 1,
-            "level": 1
-        })
+        acitivity_calendar[current_year].append(
+            {"date": current_date, "count": 1, "level": 1}
+        )
     update_activity_calendar_query = (
-        update(Profile)
-        .filter_by(id=user_id)
-        .values(activity_calendar=acitivity_calendar)
+        update(Profile).filter_by(id=user_id).values(activity_calendar=acitivity_calendar)
     )
     await db_session.execute(update_activity_calendar_query)
     await db_session.commit()
@@ -186,12 +179,16 @@ async def submit_code_sse(db_session: AsyncSession, submission_id: uuid.UUID):
         .filter_by(id=submission_id)
         .values(status=status_description, stderr=stderr)
     )
-    await db_session.execute(query)    
+    await db_session.execute(query)
     await db_session.commit()
 
 
 async def get_submissions(
-    db_session: AsyncSession, user_id: uuid.UUID, problem_id: uuid.UUID, offset: int, limit: int
+    db_session: AsyncSession,
+    user_id: uuid.UUID,
+    problem_id: uuid.UUID,
+    offset: int,
+    limit: int,
 ) -> list[Submission]:
     query = (
         select(Submission)

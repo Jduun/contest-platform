@@ -3,7 +3,7 @@ import uuid
 from typing import Annotated
 
 import requests
-from fastapi import APIRouter, Body, Depends, HTTPException, Security, status, Path
+from fastapi import APIRouter, Body, Depends, HTTPException, Path, Security, status
 from starlette.responses import StreamingResponse
 
 import src.auth.service as auth_service
@@ -12,8 +12,8 @@ from src.auth.models import User
 from src.auth.roles import Roles
 from src.config import settings
 from src.database import DbSession
-from src.submission.schemas import SubmissionAdd, SubmissionResponse
 from src.submission.exceptions import OffsetAndLimitMustNotBeNegative
+from src.submission.schemas import SubmissionAdd, SubmissionResponse
 
 submission_router = APIRouter(prefix="/submissions", tags=["Submissions"])
 
@@ -63,7 +63,9 @@ async def get_submissions(
     limit: int = 10,
 ):
     try:
-        submissions = await submission_service.get_submissions(db_session, user.id, problem_id, offset, limit)
+        submissions = await submission_service.get_submissions(
+            db_session, user.id, problem_id, offset, limit
+        )
     except OffsetAndLimitMustNotBeNegative:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
