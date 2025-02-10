@@ -2,6 +2,7 @@ import { useRef, useState } from 'react'
 import axios from 'axios'
 import { Button } from '@/components/ui/button'
 import { Pencil } from 'lucide-react'
+import { toast } from 'sonner'
 
 const uploadAvatar = async (file: File) => {
   const formData = new FormData()
@@ -19,13 +20,19 @@ const uploadAvatar = async (file: File) => {
 export function UploadAvatar() {
   const fileInputRef = useRef<HTMLInputElement>(null)
   const [loading, setLoading] = useState(false)
+  const MAX_FILE_SIZE = 1 * 1024 * 1024; // 1MB (задай нужный размер)
 
   const handleFileChange = async (
     event: React.ChangeEvent<HTMLInputElement>,
   ) => {
     if (event.target.files && event.target.files.length > 0) {
+      const file = event.target.files[0];
+      if (file.size > MAX_FILE_SIZE) {
+        toast("File size exceeds 1MB!")
+        return;
+      }
       setLoading(true)
-      await uploadAvatar(event.target.files[0])
+      await uploadAvatar(file)
       setLoading(false)
       window.location.reload()
     }
