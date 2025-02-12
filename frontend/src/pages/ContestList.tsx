@@ -6,17 +6,7 @@ import { useAtom } from 'jotai'
 import { usernameAtom } from '@/store/atoms'
 import { ContestCard } from '@/components/ContestCard/ContestCard'
 import moment from 'moment'
-
-interface UserInfo {
-  username: string
-}
-
-interface Contest {
-  id: string
-  name: string
-  start_time: string
-  end_time: string
-}
+import { UserInfo, Contest } from '@/dto'
 
 export function ContestList() {
   const navigate = useNavigate()

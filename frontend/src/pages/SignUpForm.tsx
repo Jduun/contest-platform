@@ -28,10 +28,7 @@ export function SignUpForm() {
       return
     }
     try {
-      await axios.post(
-        'http://localhost/api/register',
-        { username, password },
-      )
+      await axios.post('http://localhost/api/register', { username, password })
       // Use URLSearchParams to send data in x-www-form-urlencoded format
       const params = new URLSearchParams()
       params.append('username', username)
@@ -118,13 +115,17 @@ export function SignUpForm() {
           </div>
           <div className="mt-4 text-center text-sm">
             <p>
-            Уже есть аккаунт?{' '}
-            <Link to="/login" className="underline">
-              Войдите в аккаунт здесь!
-            </Link>
+              Уже есть аккаунт?{' '}
+              <Link to="/login" className="underline">
+                Войдите в аккаунт здесь!
+              </Link>
             </p>
             <p>
-            Регистрируясь вы соглашаетесь с <Link to="" className="underline">условиями пользования</Link>.
+              Регистрируясь вы соглашаетесь с{' '}
+              <Link to="" className="underline">
+                условиями пользования
+              </Link>
+              .
             </p>
           </div>
         </CardFooter>

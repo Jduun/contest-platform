@@ -1,4 +1,5 @@
 from datetime import datetime
+from typing import Optional
 from uuid import UUID
 
 from pydantic import BaseModel, ConfigDict
@@ -28,3 +29,9 @@ class Token(BaseModel):
 
 class TokenData(BaseModel):
     username: str
+
+
+class ProfileResponse(BaseModel):
+    avatar_url: Optional[str]
+    activity_calendar: Optional[dict]
+    passed_contests: Optional[dict]

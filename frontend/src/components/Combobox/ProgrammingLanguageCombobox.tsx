@@ -6,7 +6,6 @@ import {
   Command,
   CommandEmpty,
   CommandGroup,
-  CommandInput,
   CommandItem,
   CommandList,
 } from '@/components/ui/command'
@@ -17,66 +16,23 @@ import {
 } from '@/components/ui/popover'
 import { useAtom } from 'jotai'
 import { programmingLanguageIdAtom } from '@/store/atoms'
+import { programmingLanguagesAtom } from '@/store/atoms'
 
-const languages = [
-  {
-    value: '50',
-    label: 'C (GCC 9.2.0)',
-  },
-  {
-    value: '54',
-    label: 'C++ (GCC 9.2.0)',
-  },
-  {
-    value: '51',
-    label: 'C# (Mono 6.6.0.161)',
-  },
-  {
-    value: '60',
-    label: 'Go (1.13.5)',
-  },
-  {
-    value: '62',
-    label: 'Java (OpenJDK 13.0.1)',
-  },
-  {
-    value: '63',
-    label: 'JavaScript (Node.js 12.14.0)',
-  },
-  {
-    value: '67',
-    label: 'Pascal (FPC 3.0.4)',
-  },
-  {
-    value: '68',
-    label: 'PHP (7.4.1)',
-  },
-  {
-    value: '71',
-    label: 'Python (3.8.1)',
-  },
-  {
-    value: '72',
-    label: 'Ruby (2.7.0)',
-  },
-  {
-    value: '73',
-    label: 'Rust (1.40.0)',
-  },
-  {
-    value: '74',
-    label: 'TypeScript (3.7.4)',
-  },
-]
-
-export function Combobox() {
+export function ProgrammingLanguageCombobox() {
   const [open, setOpen] = React.useState(false)
-  const [programmingLanguageId, setProgrammingLanguageId] = useAtom(programmingLanguageIdAtom)
-  
-  React.useEffect(() => {
-      setProgrammingLanguageId(localStorage.getItem('programmingLanguageId') || '71')
-    }, []
+  const [programmingLanguageId, setProgrammingLanguageId] = useAtom(
+    programmingLanguageIdAtom,
   )
+  const [programmingLanguages, _setProgrammingLanguages] = useAtom(
+    programmingLanguagesAtom,
+  )
+
+  React.useEffect(() => {
+    setProgrammingLanguageId(
+      localStorage.getItem('programmingLanguageId') ||
+        programmingLanguages[0].value,
+    )
+  }, [])
 
   return (
     <Popover open={open} onOpenChange={setOpen}>
@@ -88,24 +44,34 @@ export function Combobox() {
           className="w-[200px] justify-between"
         >
           {programmingLanguageId
-            ? languages.find((language) => language.value === programmingLanguageId)?.label
+            ? programmingLanguages.find(
+                (language) => language.value === programmingLanguageId,
+              )?.label
             : 'Выберите язык...'}
           <ChevronsUpDown className="opacity-50" />
         </Button>
       </PopoverTrigger>
       <PopoverContent className="w-[200px] p-0">
         <Command>
-          <CommandInput placeholder="Поиск языка..." className="h-9" />
           <CommandList>
             <CommandEmpty>No language found.</CommandEmpty>
             <CommandGroup>
-              {languages.map((language) => (
+              {programmingLanguages.map((language) => (
                 <CommandItem
                   key={language.value}
                   value={language.value}
                   onSelect={(currentValue) => {
-                    setProgrammingLanguageId(currentValue === programmingLanguageId ? '' : currentValue)
-                    localStorage.setItem('programmingLanguageId', currentValue === programmingLanguageId ? '' : currentValue)
+                    setProgrammingLanguageId(
+                      currentValue === programmingLanguageId
+                        ? ''
+                        : currentValue,
+                    )
+                    localStorage.setItem(
+                      'programmingLanguageId',
+                      currentValue === programmingLanguageId
+                        ? ''
+                        : currentValue,
+                    )
                     setOpen(false)
                   }}
                 >
@@ -113,7 +79,9 @@ export function Combobox() {
                   <Check
                     className={cn(
                       'ml-auto',
-                      programmingLanguageId === language.value ? 'opacity-100' : 'opacity-0',
+                      programmingLanguageId === language.value
+                        ? 'opacity-100'
+                        : 'opacity-0',
                     )}
                   />
                 </CommandItem>

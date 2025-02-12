@@ -1,13 +1,12 @@
-{% extends "sqladmin/edit.html" %}
-
-{% block tail %}
-<link rel="stylesheet" href="https://cdn.ckeditor.com/ckeditor5/43.3.1/ckeditor5.css">
+{% extends "sqladmin/edit.html" %} {% block tail %}
+<link
+  rel="stylesheet"
+  href="https://cdn.ckeditor.com/ckeditor5/43.3.1/ckeditor5.css"
+/>
 <script src="https://cdn.ckeditor.com/ckeditor5/39.0.1/classic/ckeditor.js"></script>
 <script>
-    ClassicEditor
-        .create(document.querySelector('#statement'))
-        .catch(error => {
-            console.error(error);
-        });
+  ClassicEditor.create(document.querySelector("#statement")).catch((error) => {
+    console.error(error);
+  });
 </script>
 {% endblock %}

@@ -8,28 +8,7 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table'
-
-interface Contest {
-  id: string | undefined
-  name: string | undefined
-  start_time: string
-  end_time: string
-}
-
-interface LeaderboardEntry {
-  user_id: string
-  solved_count: number
-  total_penalty: number
-  solved_problems: string[]
-  penalty_times: number[]
-}
-
-interface User {
-  id: string
-  username: string
-  role_id: string
-  registered_at: string
-}
+import { Contest, LeaderboardEntry, User } from '@/dto'
 
 export function Leaderboard(contest: Contest) {
   const [leaderboard, setLeaderboard] = useState<LeaderboardEntry[]>([])
@@ -87,7 +66,6 @@ export function Leaderboard(contest: Contest) {
         )
         setUsers(usersData)
       } catch (error) {
-
       } finally {
         setLoading(false)
       }

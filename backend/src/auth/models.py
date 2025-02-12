@@ -1,6 +1,7 @@
 import uuid
+from typing import Optional
 
-from sqlalchemy import JSON, ForeignKey, String
+from sqlalchemy import JSON, Column, ForeignKey, String
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from src.models import Base, timestamp
@@ -34,3 +35,12 @@ class User(Base):
 
     def __str__(self):
         return self.username
+
+
+class Profile(Base):
+    __tablename__ = "profile"
+
+    id: Mapped[uuid.UUID] = mapped_column(ForeignKey("user.id"), primary_key=True)
+    activity_calendar = Column(JSON)
+    passed_contests = Column(JSON)
+    avatar_url: Mapped[Optional[str]]
