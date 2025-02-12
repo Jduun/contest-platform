@@ -14,12 +14,8 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from '@/components/ui/popover'
+import { YearComboboxProps } from '@/dto'
 
-interface YearComboboxProps {
-  startYear: number
-  year: number
-  setYear: React.Dispatch<React.SetStateAction<number>>
-}
 const currentYear: number = new Date().getFullYear()
 
 export function YearCombobox({ startYear, year, setYear }: YearComboboxProps) {

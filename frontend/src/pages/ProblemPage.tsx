@@ -10,15 +10,7 @@ import { Loader2 } from 'lucide-react'
 import { useAtom } from 'jotai'
 import { programmingLanguageIdAtom } from '@/store/atoms'
 import { SubmissionList } from '@/components/SubmissionList/SubmissionList'
-
-interface Problem {
-  id: string
-  title: string
-  statement: string
-  memory_limit: number
-  time_limit: number
-  difficulty: string
-}
+import { Problem } from '@/dto'
 
 export function ProblemPage() {
   const navigate = useNavigate()
@@ -33,12 +25,6 @@ export function ProblemPage() {
   const [programmingLanguageId, _setProgrammingLanguageId] = useAtom(
     programmingLanguageIdAtom,
   )
-
-  const difficultyToRussian: Record<string, string> = {
-    easy: 'Легкая',
-    medium: 'Средняя',
-    hard: 'Сложная',
-  }
 
   useEffect(() => {
     const getProblem = async () => {
@@ -139,10 +125,10 @@ export function ProblemPage() {
         <div>
           <h1 className="m-0 text-3xl">{problem?.title}</h1>
           <p className="m-0 text-xs">
-            Уровень сложности: {difficultyToRussian[problem?.difficulty || '']}
+            Level: {problem?.difficulty || ''}
             <br />
-            Ограничение по времени: {problem?.time_limit}с<br />
-            Ограничение по памяти: {problem?.memory_limit}Мб
+            Time limit: {problem?.time_limit}с<br />
+            Memory limit: {problem?.memory_limit}Мб
           </p>
         </div>
         <div
@@ -178,7 +164,7 @@ export function ProblemPage() {
       </div>
       {submissionStatus ? (
         <p>
-          Результат выполнения:
+          Result:
           <span
             className={`${
               submissionStatus === 'Accepted'

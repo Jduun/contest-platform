@@ -1,9 +1,6 @@
 import { useEffect, useState } from 'react'
 import moment from 'moment'
-
-interface CountdownTimerProps {
-  endTime: string // time in ISO format
-}
+import { CountdownTimerProps } from '@/dto'
 
 export function Timer({ endTime }: CountdownTimerProps) {
   const [timeLeft, setTimeLeft] = useState(() => calculateTimeLeft())

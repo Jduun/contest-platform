@@ -11,20 +11,7 @@ import { programmingLanguagesAtom } from '@/store/atoms'
 import axios, { AxiosError } from 'axios'
 import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
-
-interface SubmissionListProps {
-  problem_id: string
-  setCode: React.Dispatch<React.SetStateAction<string>>
-}
-
-interface Submission {
-  id: string
-  code: string
-  problem_id: string
-  language_id: number
-  status: string
-  submitted_at: string
-}
+import { Submission, SubmissionListProps } from '@/dto'
 
 const formatDate = (isoString: string): string => {
   const date = new Date(isoString)

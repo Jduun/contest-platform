@@ -8,24 +8,12 @@ import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import axios from 'axios'
 import { CheckIcon, Cross2Icon } from '@radix-ui/react-icons'
-
-interface ProblemCardProps {
-  id: string
-  title: string
-  difficulty: string
-  showScore: boolean
-  contest_id: string | undefined
-}
+import { ProblemCardProps } from '@/dto'
 
 export function ProblemCard(problemCardProps: ProblemCardProps) {
   const navigate = useNavigate()
   const [isSolved, setIsSolved] = useState<boolean | null>(null)
 
-  const difficultyToRussian: Record<string, string> = {
-    easy: 'Easy',
-    medium: 'Medium',
-    hard: 'Hard',
-  }
   const difficultyColors: Record<string, string> = {
     easy: 'text-green-500',
     medium: 'text-yellow-500',
@@ -71,7 +59,7 @@ export function ProblemCard(problemCardProps: ProblemCardProps) {
           <CardDescription
             className={difficultyColors[problemCardProps.difficulty]}
           >
-            {difficultyToRussian[problemCardProps.difficulty]}
+            {problemCardProps.difficulty}
           </CardDescription>
         </CardHeader>
         <div className="m-6">

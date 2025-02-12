@@ -10,10 +10,15 @@ import { ModeToggle } from '@/components/ui/mode-toggle'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { useAtom } from 'jotai'
 import { usernameAtom } from '@/store/atoms'
-
-interface UserInfo {
-  username: string
-}
+import { UserInfo } from '@/dto'
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu'
 
 export function Navbar() {
   const [username, setUsername] = useAtom(usernameAtom)
@@ -47,13 +52,12 @@ export function Navbar() {
         },
       })
       .then((response) => {
-        //setAvatarUrl(response.data.avatar_url)
-        setAvatarUrl(`${response.data.avatar_url}?v=${new Date().getTime()}`)
+        setAvatarUrl(`${response.data.avatar_url}?v=${new Date().getTime()}`) // to prevent browser caching
       })
   }, [username])
 
   return (
-    <div className="flex justify-between items-center my-2">
+    <div className="flex justify-between items-center my-2 ">
       {/* Left Side */}
       <NavigationMenu>
         <NavigationMenuList className="flex space-x-6">
@@ -73,20 +77,42 @@ export function Navbar() {
             <ModeToggle />
           </NavigationMenuItem>
           <NavigationMenuItem>
-            <Link to={`/users/${username}`}>
-              <Avatar>
-                {avatarUrl ? (
-                  <>
-                    <AvatarImage src={avatarUrl} />
+            <DropdownMenu>
+              <DropdownMenuTrigger>
+                <Avatar>
+                  {avatarUrl ? (
+                    <>
+                      <AvatarImage src={avatarUrl} />
+                      <AvatarFallback>
+                        {username?.charAt(0) ?? '?'}
+                      </AvatarFallback>
+                    </>
+                  ) : (
                     <AvatarFallback>
                       {username?.charAt(0) ?? '?'}
                     </AvatarFallback>
-                  </>
-                ) : (
-                  <AvatarFallback>{username?.charAt(0) ?? '?'}</AvatarFallback>
-                )}
-              </Avatar>
-            </Link>
+                  )}
+                </Avatar>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent>
+                <DropdownMenuLabel>{username}</DropdownMenuLabel>
+                <DropdownMenuSeparator />
+                <Link to={`/users/${username}`}>
+                  <DropdownMenuItem className="cursor-pointer">
+                    Profile
+                  </DropdownMenuItem>
+                </Link>
+                <DropdownMenuItem
+                  onClick={() => {
+                    localStorage.clear()
+                    navigate('/login')
+                  }}
+                  className="cursor-pointer"
+                >
+                  Logout
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
           </NavigationMenuItem>
         </NavigationMenuList>
       </NavigationMenu>

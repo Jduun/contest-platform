@@ -9,10 +9,7 @@ import { cloneElement, useState } from 'react'
 import { Tooltip as ReactTooltip } from 'react-tooltip'
 import 'react-tooltip/dist/react-tooltip.css'
 import { YearCombobox } from '@/components/Combobox/YearCombobox'
-
-interface CalendarProps {
-  activityData: any
-}
+import { CalendarProps } from '@/dto'
 
 const skeletonLabels = {
   months: [

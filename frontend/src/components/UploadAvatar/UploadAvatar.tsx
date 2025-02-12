@@ -20,16 +20,16 @@ const uploadAvatar = async (file: File) => {
 export function UploadAvatar() {
   const fileInputRef = useRef<HTMLInputElement>(null)
   const [loading, setLoading] = useState(false)
-  const MAX_FILE_SIZE = 1 * 1024 * 1024; // 1MB (задай нужный размер)
+  const MAX_FILE_SIZE = 1 * 1024 * 1024 // 1MB
 
   const handleFileChange = async (
     event: React.ChangeEvent<HTMLInputElement>,
   ) => {
     if (event.target.files && event.target.files.length > 0) {
-      const file = event.target.files[0];
+      const file = event.target.files[0]
       if (file.size > MAX_FILE_SIZE) {
-        toast("File size exceeds 1MB!")
-        return;
+        toast('File size exceeds 1MB!')
+        return
       }
       setLoading(true)
       await uploadAvatar(file)

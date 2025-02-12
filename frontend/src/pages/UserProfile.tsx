@@ -9,6 +9,8 @@ import { ExtendedActivityCalendar } from '@/components/ExtendedActivityCalendar/
 import { useAtom } from 'jotai'
 import { usernameAtom } from '@/store/atoms'
 import { UploadAvatar } from '@/components/UploadAvatar/UploadAvatar'
+import { ProblemPieChart } from '@/components/PieChart/ProblemPieChart'
+import { SolvedProblemsStats } from '@/dto'
 
 export function UserProfile() {
   const navigate = useNavigate()
@@ -17,10 +19,15 @@ export function UserProfile() {
   const [activityData, setActivityData] = useState<[] | null>(null)
   const [avatarUrl, setAvatarUrl] = useState<string | null>(null)
   const [_username, _setUsername] = useAtom(usernameAtom)
+  const [stats, setStats] = useState<SolvedProblemsStats>({
+    easy: 0,
+    medium: 0,
+    hard: 0,
+  })
 
   useEffect(() => {
+    const token = localStorage.getItem('token')
     const setProfileData = async () => {
-      const token = localStorage.getItem('token')
       await axios
         .get(`http://localhost/api/users/${username}/profile`, {
           headers: {
@@ -29,14 +36,28 @@ export function UserProfile() {
         })
         .then((response) => {
           setActivityData(response.data.activity_calendar)
-          //setAvatarUrl(response.data.avatar_url)
-          setAvatarUrl(`${response.data.avatar_url}?v=${new Date().getTime()}`)
+          setAvatarUrl(`${response.data.avatar_url}?v=${new Date().getTime()}`) // to prevent browser caching
+        })
+        .catch((_err: AxiosError) => {
+          navigate('/login')
+        })
+    }
+    const setProblemStats = async () => {
+      await axios
+        .get(`http://localhost/api/stats/problems`, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        })
+        .then((response) => {
+          setStats(response.data)
         })
         .catch((_err: AxiosError) => {
           navigate('/login')
         })
     }
     setProfileData()
+    setProblemStats()
   }, [])
 
   return (
@@ -44,7 +65,7 @@ export function UserProfile() {
       <Navbar />
       <div className="flex">
         <div className="flex flex-col">
-          <Avatar className="h-40 w-40">
+          <Avatar className="h-52 w-52">
             {avatarUrl !== null ? (
               <>
                 <AvatarImage src={avatarUrl} />
@@ -63,9 +84,9 @@ export function UserProfile() {
         <div className="px-6">
           <p className="text-4xl font-bold">{username}</p>
           <p className="text-xl font-bold">Solved problems</p>
-          <p className="text-green-500 text-lg">Easy: {10}</p>
-          <p className="text-yellow-500 text-lg">Medium: {15}</p>
-          <p className="text-red-500 text-lg">Hard: {20}</p>
+          <div>
+            <ProblemPieChart {...stats} />
+          </div>
         </div>
       </div>
       <div className="py-2">

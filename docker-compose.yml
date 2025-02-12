@@ -15,7 +15,7 @@ services:
     entrypoint: /backend/entrypoint.sh
     networks:
       - app-network
-    
+
   frontend:
     build:
       context: ./frontend
