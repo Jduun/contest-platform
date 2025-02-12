@@ -8,6 +8,7 @@ import { ThemeProvider } from '@/components/ui/theme-provider'
 import { ContestList } from './pages/ContestList'
 import { ContestPage } from './pages/ContestPage'
 import { Toaster } from '@/components/ui/sonner'
+import { UserProfile } from './pages/UserProfile'
 
 function App() {
   return (
@@ -20,7 +21,9 @@ function App() {
             <Route path="/signup" element={<SignUpForm />} />
             <Route path="/problems/:problem_id" element={<ProblemPage />} />
             <Route path="/contests" element={<ContestList />} />
-            {<Route path="/contests/:id" element={<ContestPage />} />}
+            <Route path="/contests/:id" element={<ContestPage />} />
+            <Route path="/contests" element={<ContestList />} />
+            <Route path="/users/:username" element={<UserProfile />} />
             <Route
               path="/contests/:contest_id/problems/:problem_id"
               element={<ProblemPage />}

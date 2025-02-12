@@ -1,30 +1,29 @@
-{% extends "sqladmin/create.html" %}
+{% extends "sqladmin/create.html" %} {% block tail %}
+<script src="https://cdn.ckeditor.com/ckeditor5/39.0.1/classic/ckeditor.js"></script>
 
-{% block tail %}
-    <script src="https://cdn.ckeditor.com/ckeditor5/39.0.1/classic/ckeditor.js"></script>
+<script>
+  document.addEventListener("DOMContentLoaded", function () {
+    const textarea = document.querySelector('textarea[name="statement"]');
 
-    <script>
-        document.addEventListener('DOMContentLoaded', function () {
-            const textarea = document.querySelector('textarea[name="statement"]');
+    if (textarea) {
+      const editorContainer = document.createElement("div");
+      textarea.style.display = "none"; // Hide original field
+      textarea.parentNode.insertBefore(editorContainer, textarea);
 
-            if (textarea) {
-                const editorContainer = document.createElement('div');
-                textarea.style.display = 'none'; // Hide original field
-                textarea.parentNode.insertBefore(editorContainer, textarea);
-
-                ClassicEditor
-                    .create(editorContainer)
-                    .then(editor => {
-                        // Synchronizing data before submitting a form
-                        document.querySelector('form').addEventListener('mousedown', function () {
-                            textarea.value = editor.getData(); // Get data in HTML format
-                            textarea.style.display = 'true';
-                        });
-                    })
-                    .catch(error => {
-                        console.error('There was a problem initializing the editor: ', error);
-                    });
-            }
+      ClassicEditor.create(editorContainer)
+        .then((editor) => {
+          // Synchronizing data before submitting a form
+          document
+            .querySelector("form")
+            .addEventListener("mousedown", function () {
+              textarea.value = editor.getData(); // Get data in HTML format
+              textarea.style.display = "true";
+            });
+        })
+        .catch((error) => {
+          console.error("There was a problem initializing the editor: ", error);
         });
-    </script>
+    }
+  });
+</script>
 {% endblock %}

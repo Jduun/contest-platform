@@ -9,13 +9,7 @@ import { Button } from '@/components/ui/button'
 import { useState, useEffect } from 'react'
 import axios, { AxiosError } from 'axios'
 import { toast } from 'sonner'
-
-interface Contest {
-  id: string
-  name: string
-  start_time: string
-  end_time: string
-}
+import { Contest } from '@/dto'
 
 export function ContestCard(contest: Contest) {
   const [joinContestStatus, setJoinContestStatus] = useState<boolean>(false)

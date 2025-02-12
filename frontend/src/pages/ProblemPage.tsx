@@ -4,37 +4,27 @@ import { useNavigate } from 'react-router-dom'
 import axios, { AxiosError } from 'axios'
 import { Navbar } from '@/components/Navbar/Navbar'
 import { CodeEditor } from '@/components/CodeEditor/CodeEditor'
-import { Combobox } from '@/components/Combobox/Combobox'
+import { ProgrammingLanguageCombobox } from '@/components/Combobox/ProgrammingLanguageCombobox'
 import { Button } from '@/components/ui/button'
 import { Loader2 } from 'lucide-react'
 import { useAtom } from 'jotai'
 import { programmingLanguageIdAtom } from '@/store/atoms'
-
-interface Problem {
-  id: string
-  title: string
-  statement: string
-  memory_limit: number
-  time_limit: number
-  difficulty: string
-}
+import { SubmissionList } from '@/components/SubmissionList/SubmissionList'
+import { Problem } from '@/dto'
 
 export function ProblemPage() {
   const navigate = useNavigate()
   const params = useParams()
   const problem_id = params.problem_id
   const contest_id = params.contest_id
+
   const [problem, setProblem] = useState<Problem | null>(null)
   const [submissionStatus, setSubmissionStatus] = useState<string>('')
   const [code, setCode] = useState<string>('')
   const [codeProcessing, setCodeProcessing] = useState<boolean>(false)
-  const [programmingLanguageId, _setProgrammingLanguageId] = useAtom(programmingLanguageIdAtom)
-
-  const difficultyToRussian: Record<string, string> = {
-    easy: 'Легкая',
-    medium: 'Средняя',
-    hard: 'Сложная',
-  }
+  const [programmingLanguageId, _setProgrammingLanguageId] = useAtom(
+    programmingLanguageIdAtom,
+  )
 
   useEffect(() => {
     const getProblem = async () => {
@@ -58,7 +48,7 @@ export function ProblemPage() {
   const submitCode = async () => {
     setCodeProcessing(true)
     if (code == '') {
-      setSubmissionStatus('Напишите код')
+      setSubmissionStatus('You need to write some code')
       setCodeProcessing(false)
       return
     }
@@ -128,17 +118,17 @@ export function ProblemPage() {
     <div className="flex flex-col w-full max-w-[900px] mx-auto">
       <Navbar />
       {
-      //<>Контест: {contest_id}</>
-      //<>Задача: {problem_id}</>
+        //<>Constest: {contest_id}</>
+        //<>Problem: {problem_id}</>
       }
       <div className="prose dark:prose-invert w-full">
         <div>
           <h1 className="m-0 text-3xl">{problem?.title}</h1>
           <p className="m-0 text-xs">
-            Уровень сложности: {difficultyToRussian[problem?.difficulty || '']}
+            Level: {problem?.difficulty || ''}
             <br />
-            Ограничение по времени: {problem?.time_limit}с<br />
-            Ограничение по памяти: {problem?.memory_limit}Мб
+            Time limit: {problem?.time_limit}с<br />
+            Memory limit: {problem?.memory_limit}Мб
           </p>
         </div>
         <div
@@ -148,7 +138,7 @@ export function ProblemPage() {
       </div>
       <div className="flex justify-between">
         <div className="py-1">
-          <Combobox />
+          <ProgrammingLanguageCombobox />
         </div>
         <div>
           {codeProcessing ? (
@@ -170,11 +160,11 @@ export function ProblemPage() {
         </div>
       </div>
       <div className="border">
-        <CodeEditor setCode={setCode} />
+        <CodeEditor code={code} setCode={setCode} />
       </div>
       {submissionStatus ? (
         <p>
-          Результат выполнения:
+          Result:
           <span
             className={`${
               submissionStatus === 'Accepted'
@@ -190,6 +180,15 @@ export function ProblemPage() {
       ) : (
         <></>
       )}
+      <div>
+        <div className="py-4">
+          {problem_id !== undefined ? (
+            <SubmissionList problem_id={problem_id} setCode={setCode} />
+          ) : (
+            <></>
+          )}
+        </div>
+      </div>
     </div>
   )
 }

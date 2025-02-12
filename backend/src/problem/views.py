@@ -15,7 +15,7 @@ from src.problem.exceptions import (
 from src.problem.schemas import ProblemResponse
 
 problem_router = APIRouter(prefix="/problems", tags=["Problems"])
-
+stats_router = APIRouter(prefix="/stats", tags=["Stats"])
 
 @problem_router.get("/", response_model=list[ProblemResponse])
 async def get_public_problems(
@@ -92,3 +92,17 @@ async def problem_is_solved(
     db_session: DbSession,
 ):
     return await problem_service.problem_is_solved(db_session, user.id, problem_id)
+
+
+@stats_router.get("/problems")
+async def get_problem_stats(
+    user: Annotated[
+        User,
+        Security(
+            auth_service.get_current_user,
+            scopes=[Roles.admin, Roles.organizer, Roles.user],
+        ),
+    ],
+    db_session: DbSession,
+):
+    return await problem_service.get_solved_problems_count(db_session, user.id)

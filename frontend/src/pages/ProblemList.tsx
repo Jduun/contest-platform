@@ -1,38 +1,22 @@
 import axios, { AxiosError } from 'axios'
 import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
+import { useSearchParams } from 'react-router-dom'
 import { Navbar } from '@/components/Navbar/Navbar'
-import {
-  Pagination,
-  PaginationContent,
-  PaginationEllipsis,
-  PaginationItem,
-  PaginationLink,
-  PaginationNext,
-  PaginationPrevious,
-} from '@/components/ui/pagination'
 import { ProblemCard } from '@/components/ProblemCard/ProblemCard'
 import { useAtom } from 'jotai'
 import { usernameAtom } from '@/store/atoms'
-
-interface UserInfo {
-  username: string
-}
-
-interface Problem {
-  id: string
-  title: string
-  statement: string
-  memory_limit: number
-  time_limit: number
-  difficulty: string
-}
+import { Problem, UserInfo } from '@/dto'
+import PaginationOverflow from '@/components/PagintationOverflow/PaginationOverflow'
 
 export function ProblemList() {
   const navigate = useNavigate()
+  const [searchParams] = useSearchParams()
   const [_username, setUsername] = useAtom(usernameAtom)
+  const [loading, setLoading] = useState<boolean>(true)
   const [problems, setProblems] = useState<Problem[] | []>([])
-
+  const pageNumber = parseInt(searchParams.get("page") || "1")
+  const problemsCountOnPage = 10
   useEffect(() => {
     const getUserInfo = async () => {
       const token = localStorage.getItem('token')
@@ -61,15 +45,19 @@ export function ProblemList() {
           },
           params: {
             offset: 0,
-            limit: 10,
+            limit: problemsCountOnPage,
           },
         })
         .then((response) => {
           console.log(response.data)
           setProblems(response.data)
         })
+        .catch((err: AxiosError) => {
+          console.log(err)
+        })
     }
     getProblems()
+    setLoading(true)
   }, [])
 
   return (
@@ -87,25 +75,12 @@ export function ProblemList() {
           />
         ))}
       </div>
-      <Pagination>
-        <PaginationContent>
-          <PaginationItem>
-            <PaginationPrevious href="#" />
-          </PaginationItem>
-          <PaginationItem>
-            <PaginationLink href="#">1</PaginationLink>
-          </PaginationItem>
-          <PaginationItem>
-            <PaginationLink href="#">2</PaginationLink>
-          </PaginationItem>
-          <PaginationItem>
-            <PaginationEllipsis />
-          </PaginationItem>
-          <PaginationItem>
-            <PaginationNext href="#" />
-          </PaginationItem>
-        </PaginationContent>
-      </Pagination>
+      <PaginationOverflow
+        basePath='/'
+        lastPage={30}
+        visibleCount={5}
+        currentPage={pageNumber}
+      />
     </div>
   )
 }

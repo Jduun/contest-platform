@@ -8,22 +8,7 @@ import moment from 'moment'
 import { toast } from 'sonner'
 import { Timer } from '@/components/Timer/Timer'
 import { Leaderboard } from '@/components/Leaderboard/Leaderboard'
-
-interface Contest {
-  id: string
-  name: string
-  start_time: string
-  end_time: string
-}
-
-interface Problem {
-  id: string
-  title: string
-  statement: string
-  memory_limit: number
-  time_limit: number
-  difficulty: string
-}
+import { Problem, Contest } from '@/dto'
 
 export function ContestPage() {
   const navigate = useNavigate()

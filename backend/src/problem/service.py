@@ -2,7 +2,7 @@ import uuid
 from datetime import datetime
 from typing import Optional
 
-from sqlalchemy import select
+from sqlalchemy import select, func, case, distinct
 from sqlalchemy.exc import SQLAlchemyError
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -75,3 +75,18 @@ async def problem_is_solved(
         if submission.status == "Accepted":
             return True
     return False
+
+
+async def get_solved_problems_count(db_session: AsyncSession, user_id: uuid.UUID) -> dict:
+    query = (
+        select(
+            func.count(distinct(Problem.id)).filter(Problem.difficulty == "easy").label("easy_count"),
+            func.count(distinct(Problem.id)).filter(Problem.difficulty == "medium").label("medium_count"),
+            func.count(distinct(Problem.id)).filter(Problem.difficulty == "hard").label("hard_count"),
+        )
+        .join(Submission, Submission.problem_id == Problem.id)
+        .filter(Submission.user_id == user_id, Submission.status == "Accepted")
+    )
+    result = await db_session.execute(query)
+    easy_count, medium_count, hard_count = result.one()
+    return {"easy": easy_count, "medium": medium_count, "hard": hard_count}

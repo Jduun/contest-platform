@@ -1,17 +1,27 @@
 import uuid
 from datetime import timedelta
-from typing import Annotated, Any
+from typing import Annotated
 
-from fastapi import APIRouter, Depends, HTTPException, Security, status
+from fastapi import (
+    APIRouter,
+    Depends,
+    HTTPException,
+    Security,
+    UploadFile,
+    status,
+    Response,
+)
 from fastapi.security import OAuth2PasswordRequestForm
+from fastapi.responses import RedirectResponse
 
 import src.auth.service as auth_service
 from src.auth.exceptions import CredentialsError, UsernameAlreadyExistsError
 from src.auth.models import User
 from src.auth.roles import Roles
-from src.auth.schemas import Token, UserAdd, UserLogin, UserResponse
+from src.auth.schemas import ProfileResponse, Token, UserAdd, UserLogin, UserResponse
 from src.config import settings
 from src.database import DbSession
+from src.s3 import avatar_s3_client
 
 auth_router = APIRouter(tags=["Auth"])
 user_router = APIRouter(prefix="/users", tags=["Users"])
@@ -49,7 +59,7 @@ async def register(
     except UsernameAlreadyExistsError:
         raise HTTPException(
             status_code=status.HTTP_409_CONFLICT,
-            detail="Пользователь с таким именем уже существует",
+            detail="User with the same name already exists",
         )
     return user
 
@@ -87,3 +97,38 @@ async def get_user_by_id(
     db_session: DbSession,
 ):
     return await auth_service.get_user_by_id(db_session, user_id)
+
+
+@user_router.get("/{username}/profile", response_model=ProfileResponse)
+async def get_profile_by_username(
+    username: str,
+    user: Annotated[
+        User,
+        Security(
+            auth_service.get_current_user,
+            scopes=[Roles.admin, Roles.organizer, Roles.user],
+        ),
+    ],
+    db_session: DbSession,
+):
+    return await auth_service.get_profile_by_username(db_session, username)
+
+
+@user_router.post("/avatars")
+async def upload_avatar(
+    user: Annotated[
+        User,
+        Security(
+            auth_service.get_current_user,
+            scopes=[Roles.admin, Roles.organizer, Roles.user],
+        ),
+    ],
+    avatar: UploadFile,
+    db_session: DbSession,
+) -> str:
+    avatar_url = await avatar_s3_client.upload_file(
+        file=avatar,
+        key=user.username,
+    )
+    await auth_service.update_image_url(db_session, user.id, avatar_url)
+    return avatar_url
