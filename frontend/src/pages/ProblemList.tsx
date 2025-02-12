@@ -13,6 +13,7 @@ export function ProblemList() {
   const navigate = useNavigate()
   const [searchParams] = useSearchParams()
   const [_username, setUsername] = useAtom(usernameAtom)
+  const [loading, setLoading] = useState<boolean>(true)
   const [problems, setProblems] = useState<Problem[] | []>([])
   const pageNumber = parseInt(searchParams.get("page") || "1")
   const problemsCountOnPage = 10
@@ -56,6 +57,7 @@ export function ProblemList() {
         })
     }
     getProblems()
+    setLoading(true)
   }, [])
 
   return (

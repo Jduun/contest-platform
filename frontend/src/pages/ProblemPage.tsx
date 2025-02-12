@@ -48,7 +48,7 @@ export function ProblemPage() {
   const submitCode = async () => {
     setCodeProcessing(true)
     if (code == '') {
-      setSubmissionStatus('Напишите код')
+      setSubmissionStatus('You need to write some code')
       setCodeProcessing(false)
       return
     }
