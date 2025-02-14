@@ -8,7 +8,7 @@ from datetime import datetime
 from typing import Any
 
 import requests
-from sqlalchemy import insert, select, update, join, func, case
+from sqlalchemy import case, func, insert, join, select, update
 from sqlalchemy.exc import SQLAlchemyError
 from sqlalchemy.ext.asyncio import AsyncSession
 

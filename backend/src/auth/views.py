@@ -6,13 +6,13 @@ from fastapi import (
     APIRouter,
     Depends,
     HTTPException,
+    Response,
     Security,
     UploadFile,
     status,
-    Response,
 )
-from fastapi.security import OAuth2PasswordRequestForm
 from fastapi.responses import RedirectResponse
+from fastapi.security import OAuth2PasswordRequestForm
 
 import src.auth.service as auth_service
 from src.auth.exceptions import CredentialsError, UsernameAlreadyExistsError

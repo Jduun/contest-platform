@@ -13,6 +13,7 @@ from src.problem.exceptions import (
     ProblemDoesNotExistError,
 )
 from src.problem.schemas import ProblemResponse
+from src.redis_cache import cache_response
 
 problem_router = APIRouter(prefix="/problems", tags=["Problems"])
 stats_router = APIRouter(prefix="/stats", tags=["Stats"])
@@ -33,7 +34,9 @@ async def get_problems_count(
     return {"count": count}
 """
 
+
 @problem_router.get("/")
+@cache_response(60, ignore_keys=["user", "db_session"])
 async def get_public_problems(
     user: Annotated[
         User,
@@ -49,16 +52,15 @@ async def get_public_problems(
     limit: int = 10,
 ):
     try:
-        problems, count = await problem_service.get_public_problems(db_session, search_input, difficulty, offset, limit)
+        problems, count = await problem_service.get_public_problems(
+            db_session, search_input, difficulty, offset, limit
+        )
     except OffsetAndLimitMustNotBeNegative:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail="Offset and limit must not be negative",
         )
-    return {
-        "problems": problems,
-        "count": count
-    }
+    return {"problems": problems, "count": count}
 
 
 @problem_router.get("/{problem_id}", response_model=ProblemResponse)

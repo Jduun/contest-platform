@@ -1,14 +1,11 @@
 import uuid
-from datetime import datetime
 from typing import Optional
 
-from sqlalchemy import select, func, distinct, and_
+from sqlalchemy import distinct, func, select
 from sqlalchemy.exc import SQLAlchemyError
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from src.problem.exceptions import (
-    OffsetAndLimitMustNotBeNegative,
-)
+from src.problem.exceptions import OffsetAndLimitMustNotBeNegative
 from src.problem.models import Problem
 from src.submission.models import Submission
 
@@ -27,14 +24,18 @@ async def get_problems(
 
 
 async def get_public_problems(
-    db_session: AsyncSession, search_input: str, difficulty: str, offset: int, limit: int
+    db_session: AsyncSession,
+    search_input: str,
+    difficulty: str,
+    offset: int,
+    limit: int,
 ) -> list[Problem]:
     criteria = [Problem.is_public == True]
     if search_input != "":
         criteria.append(Problem.title.ilike(f"%{search_input}%"))
     if difficulty != "all":
         criteria.append(Problem.difficulty == difficulty)
-    
+
     query = (
         select(Problem)
         .filter(*criteria)
@@ -48,10 +49,7 @@ async def get_public_problems(
         raise OffsetAndLimitMustNotBeNegative
     problems = res.scalars().all()
 
-    query = (
-        select(func.count(Problem.id))
-        .filter(*criteria)
-    )
+    query = select(func.count(Problem.id)).filter(*criteria)
     res = await db_session.execute(query)
     count = res.scalar()
 

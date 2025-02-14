@@ -156,7 +156,10 @@ async def get_contest_leaderboard(
             ),
             func.sum(
                 case(
-                    (ContestResult.problem_is_solved == True, ContestResult.penalty_time)
+                    (
+                        ContestResult.problem_is_solved == True,
+                        ContestResult.penalty_time,
+                    )
                 )
             ).label("total_penalty"),
             func.array_agg(
@@ -164,7 +167,10 @@ async def get_contest_leaderboard(
             ).label("solved_problems"),
             func.array_agg(
                 case(
-                    (ContestResult.problem_is_solved == True, ContestResult.penalty_time)
+                    (
+                        ContestResult.problem_is_solved == True,
+                        ContestResult.penalty_time,
+                    )
                 )
             ).label("penalty_times"),
         )
