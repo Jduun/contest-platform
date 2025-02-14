@@ -24,10 +24,10 @@ const PaginationOverflow: React.FC<PaginationProps> = ({
   visibleCount = 3,
 }) => {
   if (!basePath || !lastPage || !currentPage) {
-    return <div>Missing required props for pagination component.</div>
+    return <div></div>
   }
 
-  if (visibleCount > lastPage) return <div>a</div>
+  if (visibleCount > lastPage) return <div></div>
   if (currentPage > lastPage || currentPage < 1) return null
 
   const navigationLinkHref = (pageNumber: number) => {
@@ -52,7 +52,9 @@ const PaginationOverflow: React.FC<PaginationProps> = ({
     currentPage > Math.ceil(visibleCount / 2) &&
     currentPage <= lastPage - Math.ceil(visibleCount / 2)
   ) {
-    numbers = numbers.map((_, i) => i + 1 + currentPage - Math.ceil(visibleCount / 2))
+    numbers = numbers.map(
+      (_, i) => i + 1 + currentPage - Math.ceil(visibleCount / 2),
+    )
   } else if (currentPage > lastPage - Math.ceil(visibleCount / 2)) {
     numbers = numbers.map((_, i) => i + lastPage - visibleCount + 1)
   }

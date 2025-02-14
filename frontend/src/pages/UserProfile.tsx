@@ -11,6 +11,7 @@ import { usernameAtom } from '@/store/atoms'
 import { UploadAvatar } from '@/components/UploadAvatar/UploadAvatar'
 import { ProblemPieChart } from '@/components/PieChart/ProblemPieChart'
 import { SolvedProblemsStats } from '@/dto'
+import { Skeleton } from '@/components/ui/skeleton'
 
 export function UserProfile() {
   const navigate = useNavigate()
@@ -70,12 +71,12 @@ export function UserProfile() {
               <>
                 <AvatarImage src={avatarUrl} />
                 <AvatarFallback>
-                  <div className="w-40 h-40 rounded-full"></div>
+                  <Skeleton className="h-52 w-52 rounded-full bg-primary" />
                 </AvatarFallback>
               </>
             ) : (
               <AvatarFallback>
-                <div className="w-40 h-40 rounded-full"></div>
+                <Skeleton className="h-52 w-52 rounded-full bg-primary" />
               </AvatarFallback>
             )}
           </Avatar>
