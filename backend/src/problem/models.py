@@ -1,6 +1,6 @@
 import uuid
 
-from sqlalchemy import JSON, Column, ForeignKey, String, Text
+from sqlalchemy import ForeignKey, String
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from src.models import Base, Difficulty, timestamp, timestamp_updated

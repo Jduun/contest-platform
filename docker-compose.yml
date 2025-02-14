@@ -74,8 +74,19 @@ services:
       MINIO_ROOT_USER: "${MINIO_ACCESS_KEY}"
       MINIO_ROOT_PASSWORD: "${MINIO_SECRET_KEY}"
     volumes:
-      - ${MINIO_PATH}:/${MINIO_PATH}
+      - ${MINIO_PATH}:${MINIO_PATH}
     command: server --console-address ":${MINIO_WEB_PORT}" ${MINIO_PATH}
+    networks:
+      - app-network
+
+  redis:
+    image: redis:alpine
+    container_name: redis_cache
+    ports:
+      - "${REDIS_PORT}:${REDIS_PORT}"
+    environment:
+      - REDIS_PASSWORD="${REDIS_PASSWORD}"
+    command: ["redis-server", "--requirepass", "${REDIS_PASSWORD}"]
     networks:
       - app-network
 

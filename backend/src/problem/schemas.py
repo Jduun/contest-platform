@@ -3,15 +3,13 @@ from datetime import datetime
 
 from pydantic import BaseModel
 
-from src.models import Difficulty
-
 
 class ProblemAdd(BaseModel):
     title: str
     statement: str
     memory_limit: int
     time_limit: int
-    difficulty: Difficulty
+    difficulty: str
     is_public: bool
 
 
@@ -24,3 +22,6 @@ class ProblemResponse(ProblemUpdate):
     author_id: uuid.UUID
     created_at: datetime
     updated_at: datetime
+
+    class Config:
+        from_attributes = True

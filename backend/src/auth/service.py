@@ -11,10 +11,7 @@ from sqlalchemy import insert, select, update
 from sqlalchemy.exc import SQLAlchemyError
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from src.auth.exceptions import (
-    CredentialsError,
-    UsernameAlreadyExistsError,
-)
+from src.auth.exceptions import CredentialsError, UsernameAlreadyExistsError
 from src.auth.models import Profile, Role, User
 from src.auth.schemas import UserAdd, UserLogin
 from src.config import settings
