@@ -99,7 +99,7 @@ export function Leaderboard(contest: Contest) {
             return (
               <TableRow
                 key={entry.user_id}
-                className={isCurrentUser ? 'bg-blue-100 font-bold' : ''}
+                className={isCurrentUser ? 'font-bold text-green-500' : ''}
               >
                 <TableCell>{index + 1}</TableCell>
                 <TableCell>

@@ -20,14 +20,11 @@ It is a web platform designed for developers and enthusiasts to engage in coding
 - [x] Admin panel for admins and organizers
 - [x] Intuitive and responsive user interface with light and dark mode
 - [x] Built-in Code Editor
-- [x] Contests
 - [x] Leaderboard
-- [ ] Multi-Language Support
-- [ ] User profile
-- [ ] Submission History
-- [ ] Telegram Bot for notifications
-- [ ] Problem Statements in Markdown format
-- [ ] Request caching with Redis
+- [x] Multi-Language Support
+- [x] User profile
+- [x] Submission History
+- [ ] Contests
 
 ## Technologies
 

@@ -79,7 +79,9 @@ export function ContestCard(contest: Contest) {
           <CardTitle
             className="hover:underline cursor-pointer"
             onClick={() => {
-              navigate(`/contests/${contest.id}`)
+              if (joinContestStatus) {
+                navigate(`/contests/${contest.id}`)
+              }
             }}
           >
             {contest.name}
