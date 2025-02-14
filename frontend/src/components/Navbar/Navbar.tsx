@@ -57,11 +57,15 @@ export function Navbar() {
   }, [username])
 
   return (
-    <div className="flex justify-between items-center my-2 ">
+    <div className="flex justify-between items-center my-2">
       {/* Left Side */}
       <NavigationMenu>
         <NavigationMenuList className="flex space-x-6">
-          <NavigationMenuItem>
+          <NavigationMenuItem
+            onClick={() => {
+              window.location.reload()
+            }}
+          >
             <Link to="/">Problems</Link>
           </NavigationMenuItem>
           <NavigationMenuItem>

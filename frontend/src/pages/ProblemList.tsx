@@ -8,18 +8,67 @@ import { useAtom } from 'jotai'
 import { usernameAtom } from '@/store/atoms'
 import { Problem, UserInfo } from '@/dto'
 import PaginationOverflow from '@/components/PagintationOverflow/PaginationOverflow'
+import { Input } from '@/components/ui/input'
+import {
+  Select,
+  SelectContent,
+  SelectGroup,
+  SelectItem,
+  SelectLabel,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select'
+
+const difficultyColors: Record<string, string> = {
+  easy: 'text-green-500',
+  medium: 'text-yellow-500',
+  hard: 'text-red-500',
+}
 
 export function ProblemList() {
   const navigate = useNavigate()
   const [searchParams] = useSearchParams()
   const [_username, setUsername] = useAtom(usernameAtom)
-  const [loading, setLoading] = useState<boolean>(true)
   const [problems, setProblems] = useState<Problem[] | []>([])
-  const pageNumber = parseInt(searchParams.get("page") || "1")
-  const problemsCountOnPage = 10
+  const [pagesCount, setPageCount] = useState<number>(1)
+  const [searchInput, setSearchInput] = useState<string>('')
+  const [difficulty, setDifficulty] = useState<string>('all')
+  const [pageNumber, setPageNumber] = useState<number>(
+    parseInt(searchParams.get('page') || '1'),
+  )
+  const problemsCountOnPage = 9
+
+  interface ProblemsResponse {
+    problems: Problem[]
+    count: number
+  }
+
+  const fetchProblems = async () => {
+    const token = localStorage.getItem('token')
+    await axios
+      .get<ProblemsResponse>('http://localhost/api/problems', {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+        params: {
+          search_input: searchInput,
+          difficulty: difficulty,
+          offset: (pageNumber - 1) * problemsCountOnPage,
+          limit: problemsCountOnPage,
+        },
+      })
+      .then((response) => {
+        setProblems(response.data.problems)
+        setPageCount(Math.ceil(response.data.count / problemsCountOnPage))
+      })
+      .catch((err: AxiosError) => {
+        console.log(err)
+      })
+  }
+
   useEffect(() => {
-    const getUserInfo = async () => {
-      const token = localStorage.getItem('token')
+    const token = localStorage.getItem('token')
+    const fetchUserInfo = async () => {
       await axios
         .get<UserInfo>('http://localhost/api/users/me', {
           headers: {
@@ -34,35 +83,59 @@ export function ProblemList() {
           return
         })
     }
-    getUserInfo()
-
-    const getProblems = async () => {
-      const token = localStorage.getItem('token')
-      await axios
-        .get<Problem[]>('http://localhost/api/problems', {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-          params: {
-            offset: 0,
-            limit: problemsCountOnPage,
-          },
-        })
-        .then((response) => {
-          console.log(response.data)
-          setProblems(response.data)
-        })
-        .catch((err: AxiosError) => {
-          console.log(err)
-        })
-    }
-    getProblems()
-    setLoading(true)
+    fetchUserInfo()
+    fetchProblems()
   }, [])
+
+  useEffect(() => {
+    fetchProblems()
+  }, [searchInput, difficulty])
 
   return (
     <div className="flex flex-col w-full max-w-[900px] mx-auto">
       <Navbar />
+      <div className="flex">
+        <div className="pb-2 pr-2">
+          <Input
+            type="text"
+            placeholder="Search problem"
+            value={searchInput}
+            onChange={(e) => {
+              setPageNumber(1)
+              setSearchInput(e.target.value)
+            }}
+          />
+        </div>
+        <div>
+          <Select
+            onValueChange={(value) => {
+              setPageNumber(1)
+              setDifficulty(value)
+            }}
+          >
+            <SelectTrigger className="w-[180px]">
+              <SelectValue placeholder="Select difficulty" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectGroup>
+                <SelectLabel>Difficulty</SelectLabel>
+                <SelectItem value="all">
+                  <p>all</p>
+                </SelectItem>
+                <SelectItem value="easy">
+                  <p className={difficultyColors['easy']}>easy</p>
+                </SelectItem>
+                <SelectItem value="medium">
+                  <p className={difficultyColors['medium']}>medium</p>
+                </SelectItem>
+                <SelectItem value="hard">
+                  <p className={difficultyColors['hard']}>hard</p>
+                </SelectItem>
+              </SelectGroup>
+            </SelectContent>
+          </Select>
+        </div>
+      </div>
       <div>
         {problems.map((problem) => (
           <ProblemCard
@@ -75,12 +148,16 @@ export function ProblemList() {
           />
         ))}
       </div>
-      <PaginationOverflow
-        basePath='/'
-        lastPage={30}
-        visibleCount={5}
-        currentPage={pageNumber}
-      />
+      {pagesCount !== 1 ? (
+        <PaginationOverflow
+          basePath="/"
+          lastPage={pagesCount}
+          visibleCount={Math.min(5, pagesCount)}
+          currentPage={pageNumber}
+        />
+      ) : (
+        <></>
+      )}
     </div>
   )
 }
