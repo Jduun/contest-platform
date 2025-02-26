@@ -24,6 +24,7 @@ It is a web platform designed for developers and enthusiasts to engage in coding
 - [x] Multi-Language Support
 - [x] User profile
 - [x] Submission History
+- [x] Request Caching with Redis
 - [ ] Contests
 
 ## Technologies
