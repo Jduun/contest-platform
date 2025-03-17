@@ -18,8 +18,8 @@ async def get_problems(
     )
     try:
         res = await db_session.execute(query)
-    except SQLAlchemyError:
-        raise OffsetAndLimitMustNotBeNegative
+    except SQLAlchemyError as e:
+        raise OffsetAndLimitMustNotBeNegative from e
     return res.scalars().all()
 
 
@@ -30,7 +30,7 @@ async def get_public_problems(
     offset: int,
     limit: int,
 ) -> list[Problem]:
-    criteria = [Problem.is_public == True]
+    criteria = [Problem.is_public]
     if search_input != "":
         criteria.append(Problem.title.ilike(f"%{search_input}%"))
     if difficulty != "all":
@@ -45,8 +45,8 @@ async def get_public_problems(
     )
     try:
         res = await db_session.execute(query)
-    except SQLAlchemyError:
-        raise OffsetAndLimitMustNotBeNegative
+    except SQLAlchemyError as e:
+        raise OffsetAndLimitMustNotBeNegative from e
     problems = res.scalars().all()
 
     query = select(func.count(Problem.id)).filter(*criteria)
@@ -63,11 +63,11 @@ async def get_public_problems_count(db_session: AsyncSession) -> int:
 
 
 async def filter_problems(db_session: AsyncSession, search_input: str) -> list[Problem]:
-    query = select(Problem).filter(Problem.title.ilike(f"%{input}%"))
+    query = select(Problem).filter(Problem.title.ilike(f"%{search_input}%"))
     try:
         res = await db_session.execute(query)
-    except SQLAlchemyError:
-        raise OffsetAndLimitMustNotBeNegative
+    except SQLAlchemyError as e:
+        raise OffsetAndLimitMustNotBeNegative from e
     return res.scalars().all()
 
 
@@ -108,7 +108,9 @@ async def problem_is_solved(
     return False
 
 
-async def get_solved_problems_count(db_session: AsyncSession, user_id: uuid.UUID) -> dict:
+async def get_solved_problems_count(
+    db_session: AsyncSession, user_id: uuid.UUID
+) -> dict:
     query = (
         select(
             func.count(distinct(Problem.id))

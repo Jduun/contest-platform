@@ -6,7 +6,7 @@ from pydantic_settings import BaseSettings
 
 class Settings(BaseSettings):
     DB_HOST: str = os.getenv("DB_HOST")
-    DB_PORT: int = os.getenv("DB_PORT")
+    DB_PORT: int = 5432
     DB_USER: str = os.getenv("DB_USER")
     DB_PASS: str = os.getenv("DB_PASS")
     DB_NAME: str = os.getenv("DB_NAME")
@@ -22,7 +22,7 @@ class Settings(BaseSettings):
 
     @property
     def db_url(self):
-        return f"postgresql+asyncpg://{self.DB_USER}:{self.DB_PASS}@{self.DB_HOST}:{self.DB_PORT}/{self.DB_NAME}"
+        return f"postgresql+asyncpg://{settings.DB_USER}:{settings.DB_PASS}@{settings.DB_HOST}:{settings.DB_PORT}/{settings.DB_NAME}"
 
     @property
     def code_exe_url(self):

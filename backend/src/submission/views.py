@@ -1,16 +1,13 @@
-import json
 import uuid
 from typing import Annotated
 
-import requests
-from fastapi import APIRouter, Body, Depends, HTTPException, Path, Security, status
+from fastapi import APIRouter, HTTPException, Security, status
 from starlette.responses import StreamingResponse
 
 import src.auth.service as auth_service
 import src.submission.service as submission_service
 from src.auth.models import User
 from src.auth.roles import Roles
-from src.config import settings
 from src.database import DbSession
 from src.submission.exceptions import OffsetAndLimitMustNotBeNegative
 from src.submission.schemas import SubmissionAdd, SubmissionResponse
@@ -41,7 +38,7 @@ async def submit_code(
     db_session: DbSession,
     submission_id: uuid.UUID,
 ):
-    # I use Server Side Events (SSE) here
+    # I use Server Sent Events (SSE) here
     return StreamingResponse(
         submission_service.submit_code_sse(db_session, submission_id),
         media_type="text/event-stream",
@@ -66,9 +63,9 @@ async def get_submissions(
         submissions = await submission_service.get_submissions(
             db_session, user.id, problem_id, offset, limit
         )
-    except OffsetAndLimitMustNotBeNegative:
+    except OffsetAndLimitMustNotBeNegative as e:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail="Offset and limit must not be negative",
-        )
+        ) from e
     return submissions

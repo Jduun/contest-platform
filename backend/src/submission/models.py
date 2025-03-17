@@ -1,5 +1,4 @@
 import uuid
-from typing import Optional
 
 from sqlalchemy import ForeignKey
 from sqlalchemy.orm import Mapped, mapped_column, relationship
@@ -20,4 +19,6 @@ class Submission(Base):
     submitted_at: Mapped[timestamp]
 
     user: Mapped["User"] = relationship(back_populates="submissions", lazy="joined")
-    problem: Mapped["Problem"] = relationship(back_populates="submissions", lazy="joined")
+    problem: Mapped["Problem"] = relationship(
+        back_populates="submissions", lazy="joined"
+    )

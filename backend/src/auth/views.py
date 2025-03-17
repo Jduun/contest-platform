@@ -2,20 +2,15 @@ import uuid
 from datetime import timedelta
 from typing import Annotated
 
-from fastapi import (
-    APIRouter,
-    Depends,
-    HTTPException,
-    Response,
-    Security,
-    UploadFile,
-    status,
-)
-from fastapi.responses import RedirectResponse
+from fastapi import APIRouter, Depends, HTTPException, Security, UploadFile, status
 from fastapi.security import OAuth2PasswordRequestForm
 
 import src.auth.service as auth_service
-from src.auth.exceptions import CredentialsError, UsernameAlreadyExistsError
+from src.auth.exceptions import (
+    CredentialsError,
+    NotEnoughPermissions,
+    UsernameAlreadyExistsError,
+)
 from src.auth.models import User
 from src.auth.roles import Roles
 from src.auth.schemas import ProfileResponse, Token, UserAdd, UserLogin, UserResponse
@@ -35,12 +30,12 @@ async def login(
     user_login = UserLogin.model_validate(form_data)
     try:
         user = await auth_service.authenticate(db_session, user_login)
-    except CredentialsError:
+    except CredentialsError as e:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Incorrect username or password",
             headers={"WWW-Authenticate": "Bearer"},
-        )
+        ) from e
     access_token = auth_service.create_access_token(
         token_data={"username": user.username, "role": user.role.name},
         expires_delta=timedelta(minutes=settings.ACCESS_TOKEN_EXPIRE_MINUTES),
@@ -53,14 +48,26 @@ async def register(
     user_add: UserAdd,
     db_session: DbSession,
 ):
+    min_username_length = 1
+    min_password_length = 8
+    if len(user_add.username) < min_username_length:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail=f"Username must be at least {min_username_length} characters long",
+        )
+    if len(user_add.password) < min_password_length:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail=f"Password must be at least {min_password_length} characters long",
+        )
     user_add.password = auth_service.get_password_hash(user_add.password)
     try:
         user = await auth_service.add_user(db_session, user_add)
-    except UsernameAlreadyExistsError:
+    except UsernameAlreadyExistsError as e:
         raise HTTPException(
             status_code=status.HTTP_409_CONFLICT,
             detail="User with the same name already exists",
-        )
+        ) from e
     return user
 
 
@@ -72,16 +79,22 @@ async def get_me(
             auth_service.get_current_user,
             scopes=[Roles.admin, Roles.organizer, Roles.user],
         ),
-    ]
+    ],
 ):
     try:
         return user
-    except CredentialsError:
+    except CredentialsError as e:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Неверное имя пользователя или пароль",
+            detail="Incorrect username or password",
             headers={"WWW-Authenticate": "Bearer"},
-        )
+        ) from e
+    except NotEnoughPermissions as e:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Not enough permissions",
+            headers={"WWW-Authenticate": "Bearer"},
+        ) from e
 
 
 @user_router.get("/{user_id}", response_model=UserResponse)

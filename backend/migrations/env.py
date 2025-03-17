@@ -25,7 +25,7 @@ config.set_main_option("sqlalchemy.url", f"{settings.db_url}?async_fallback=True
 # for 'autogenerate' support
 # from myapp import mymodel
 # target_metadata = mymodel.Base.metadata
-target_metadata = Base.metadata
+target_metadata = Base.metadata  # noqa: F405
 
 # other values from the config, defined by the needs of env.py,
 # can be acquired:

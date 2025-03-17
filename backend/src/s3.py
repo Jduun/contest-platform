@@ -1,6 +1,5 @@
 import json
 import os
-import uuid
 from contextlib import asynccontextmanager
 
 from aiobotocore.session import get_session

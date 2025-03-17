@@ -5,10 +5,9 @@ import math
 import os
 import uuid
 from datetime import datetime
-from typing import Any
 
 import requests
-from sqlalchemy import case, func, insert, join, select, update
+from sqlalchemy import insert, select, update
 from sqlalchemy.exc import SQLAlchemyError
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -87,7 +86,9 @@ async def add_submission(
             {"date": current_date, "count": 1, "level": 1}
         )
     update_activity_calendar_query = (
-        update(Profile).filter_by(id=user_id).values(activity_calendar=acitivity_calendar)
+        update(Profile)
+        .filter_by(id=user_id)
+        .values(activity_calendar=acitivity_calendar)
     )
     await db_session.execute(update_activity_calendar_query)
     await db_session.commit()
@@ -156,10 +157,10 @@ async def submit_code_sse(db_session: AsyncSession, submission_id: uuid.UUID):
             statuses.append(
                 (curr_status_id, curr_status_description, test_number, curr_stderr)
             )
-        if all([i[0] == ACCEPTED_STATUS_ID for i in statuses]):
+        if all(i[0] == ACCEPTED_STATUS_ID for i in statuses):
             status_id = ACCEPTED_STATUS_ID
             status_description = "Accepted"
-        elif any([i[0] < ACCEPTED_STATUS_ID for i in statuses]):
+        elif any(i[0] < ACCEPTED_STATUS_ID for i in statuses):
             status_id = PROCESSING_STATUS_ID
             status_description = "Processing"
         else:
@@ -170,7 +171,8 @@ async def submit_code_sse(db_session: AsyncSession, submission_id: uuid.UUID):
                     stderr = curr_stderr
                     break
 
-        yield f"event: locationUpdate\ndata: {status_description}{'. ' + base64_to_string(stderr) if stderr else ''}\n\n"
+        yield f"event: locationUpdate\ndata: {status_description}"
+        "{'. ' + base64_to_string(stderr) if stderr else ''}\n\n"
         await asyncio.sleep(5)
 
     stderr = base64_to_string(stderr) if stderr else ""
@@ -199,6 +201,6 @@ async def get_submissions(
     )
     try:
         res = await db_session.execute(query)
-    except SQLAlchemyError:
-        raise OffsetAndLimitMustNotBeNegative
+    except SQLAlchemyError as e:
+        raise OffsetAndLimitMustNotBeNegative from e
     return res.scalars().all()

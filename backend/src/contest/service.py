@@ -1,9 +1,7 @@
 import uuid
 from datetime import datetime
 
-from fastapi.encoders import jsonable_encoder
 from sqlalchemy import asc, case, delete, desc, func, insert, select, update
-from sqlalchemy.dialects.postgresql import array_agg
 from sqlalchemy.exc import SQLAlchemyError
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -25,8 +23,8 @@ async def get_contests(
     query = select(Contest).offset(offset).limit(limit)
     try:
         res = await db_session.execute(query)
-    except SQLAlchemyError:
-        raise OffsetAndLimitMustNotBeNegative
+    except SQLAlchemyError as e:
+        raise OffsetAndLimitMustNotBeNegative from e
     return res.scalars().all()
 
 
@@ -43,8 +41,8 @@ async def get_contest_problems(
     query = select(ContestProblem).filter_by(contest_id=contest_id)
     try:
         res = await db_session.execute(query)
-    except SQLAlchemyError:
-        raise ContestProblemDoesNotExistError
+    except SQLAlchemyError as e:
+        raise ContestProblemDoesNotExistError from e
     await db_session.commit()
     return [
         await problem_service.get_problem_by_id(db_session, i.problem_id)
@@ -62,8 +60,8 @@ async def join_contest(
         query = insert(ContestUser).values(contest_id=contest_id, user_id=user_id)
         await db_session.execute(query)
         await db_session.commit()
-    except SQLAlchemyError:
-        raise JoinContestError
+    except SQLAlchemyError as e:
+        raise JoinContestError from e
 
 
 async def unjoin_contest(
@@ -76,8 +74,8 @@ async def unjoin_contest(
         query = delete(ContestUser).filter_by(contest_id=contest_id, user_id=user_id)
         await db_session.execute(query)
         await db_session.commit()
-    except SQLAlchemyError:
-        raise UnjoinContestError
+    except SQLAlchemyError as e:
+        raise UnjoinContestError from e
 
 
 async def get_join_contest_status(
@@ -97,7 +95,9 @@ async def calculate_penalty_time(
     user_id: uuid.UUID,
     submission_status: str,
 ) -> int:
-    query = select(ContestProblem).filter_by(contest_id=contest_id, problem_id=problem_id)
+    query = select(ContestProblem).filter_by(
+        contest_id=contest_id, problem_id=problem_id
+    )
     res = await db_session.execute(query)
     contest_problem = res.scalars().first()
     if contest_problem is None:
@@ -151,24 +151,24 @@ async def get_contest_leaderboard(
     query = (
         select(
             ContestResult.user_id,
-            func.count(case((ContestResult.problem_is_solved == True, 1))).label(
+            func.count(case((ContestResult.problem_is_solved, 1))).label(
                 "solved_count"
             ),
             func.sum(
                 case(
                     (
-                        ContestResult.problem_is_solved == True,
+                        ContestResult.problem_is_solved,
                         ContestResult.penalty_time,
                     )
                 )
             ).label("total_penalty"),
             func.array_agg(
-                case((ContestResult.problem_is_solved == True, ContestResult.problem_id))
+                case((ContestResult.problem_is_solved, ContestResult.problem_id))
             ).label("solved_problems"),
             func.array_agg(
                 case(
                     (
-                        ContestResult.problem_is_solved == True,
+                        ContestResult.problem_is_solved,
                         ContestResult.penalty_time,
                     )
                 )

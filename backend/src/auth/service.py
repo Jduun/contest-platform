@@ -4,14 +4,18 @@ from typing import Annotated, Any, Optional
 
 import bcrypt
 import jwt
-from fastapi import Depends, HTTPException, status
+from fastapi import Depends
 from fastapi.security import SecurityScopes
 from jwt.exceptions import InvalidTokenError
 from sqlalchemy import insert, select, update
 from sqlalchemy.exc import SQLAlchemyError
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from src.auth.exceptions import CredentialsError, UsernameAlreadyExistsError
+from src.auth.exceptions import (
+    CredentialsError,
+    NotEnoughPermissions,
+    UsernameAlreadyExistsError,
+)
 from src.auth.models import Profile, Role, User
 from src.auth.schemas import UserAdd, UserLogin
 from src.config import settings
@@ -32,7 +36,9 @@ def create_access_token(token_data: dict, expires_delta: timedelta) -> str:
     to_encode = token_data.copy()
     expire = datetime.now(timezone.utc) + expires_delta
     to_encode["exp"] = expire
-    encoded_jwt = jwt.encode(to_encode, settings.SECRET_KEY, algorithm=settings.ALGORITHM)
+    encoded_jwt = jwt.encode(
+        to_encode, settings.SECRET_KEY, algorithm=settings.ALGORITHM
+    )
     return encoded_jwt
 
 
@@ -67,27 +73,33 @@ async def add_user(db_session: AsyncSession, user_add: UserAdd) -> User:
         )
         res = await db_session.execute(add_profile_query)
         await db_session.commit()
-    except SQLAlchemyError:
-        raise UsernameAlreadyExistsError
+    except SQLAlchemyError as e:
+        raise UsernameAlreadyExistsError from e
     return new_user
 
 
-async def update_image_url(db_session: AsyncSession, user_id: uuid.UUID, avatar_url: str):
+async def update_image_url(
+    db_session: AsyncSession, user_id: uuid.UUID, avatar_url: str
+):
     query = update(Profile).filter_by(id=user_id).values(avatar_url=avatar_url)
     await db_session.execute(query)
     await db_session.commit()
 
 
-async def get_user_by_id(db_session: AsyncSession, user_id: uuid.UUID) -> Optional[User]:
+async def get_user_by_id(
+    db_session: AsyncSession, user_id: uuid.UUID
+) -> Optional[User]:
     query = select(User).filter_by(id=user_id)
     res = await db_session.execute(query)
     return res.scalars().first()
 
 
-async def get_user_by_username(db_session: AsyncSession, username: str) -> Optional[User]:
+async def get_user_by_username(
+    db_session: AsyncSession, username: str
+) -> Optional[User]:
     query = select(User).filter_by(username=username)
     res = await db_session.execute(query)
-    return res.scalars().first()
+    return res.scalar()
 
 
 async def authenticate(db_session: AsyncSession, user_login: UserLogin) -> User:
@@ -105,46 +117,32 @@ async def get_current_user(
     token: Annotated[str, Depends(settings.oauth2)],
     db_session: DbSession,
 ) -> User:
-    if security_scopes.scopes:
-        authenticate_value = f'Bearer scope="{security_scopes.scope_str}"'
-    else:
-        authenticate_value = "Bearer"
-
-    credentials_exception = HTTPException(
-        status_code=status.HTTP_401_UNAUTHORIZED,
-        detail="Incorrect username or password",
-        headers={"WWW-Authenticate": "Bearer"},
-    )
-    not_enough_permissions_exception = HTTPException(
-        status_code=status.HTTP_401_UNAUTHORIZED,
-        detail="Not enough permissions",
-        headers={"WWW-Authenticate": authenticate_value},
-    )
-
     try:
         payload = get_token_payload(token)
-    except InvalidTokenError:
-        raise credentials_exception
+    except InvalidTokenError as e:
+        raise CredentialsError from e
 
     username = payload.get("username")
     role_from_token = payload.get("role", [])
     if username is None:
-        raise credentials_exception
+        raise CredentialsError
 
     user = await get_user_by_username(db_session, username)
     if user is None:
-        raise credentials_exception
+        raise CredentialsError
 
     permitted_roles = security_scopes.scopes
     for role in permitted_roles:
         if role == role_from_token:
             return user
-    raise not_enough_permissions_exception
+    raise NotEnoughPermissions
 
 
 def get_token_payload(token: str) -> Any:
     try:
-        payload = jwt.decode(token, settings.SECRET_KEY, algorithms=[settings.ALGORITHM])
+        payload = jwt.decode(
+            token, settings.SECRET_KEY, algorithms=[settings.ALGORITHM]
+        )
     except InvalidTokenError:
         raise
     return payload
