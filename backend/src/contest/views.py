@@ -2,7 +2,7 @@ import uuid
 from datetime import datetime
 from typing import Annotated
 
-from fastapi import APIRouter, Body, HTTPException, Security, status
+from fastapi import APIRouter, HTTPException, Security, status
 
 import src.auth.service as auth_service
 import src.contest.service as contest_service
@@ -37,11 +37,11 @@ async def get_contests(
 ):
     try:
         contests = await contest_service.get_contests(db_session, offset, limit)
-    except OffsetAndLimitMustNotBeNegative:
+    except OffsetAndLimitMustNotBeNegative as e:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail="Offset and limit must not be negative",
-        )
+        ) from e
     return contests
 
 
@@ -59,11 +59,11 @@ async def get_contest(
 ):
     try:
         contest = await contest_service.get_contest_by_id(db_session, contest_id)
-    except ContestDoesNotExistError:
+    except ContestDoesNotExistError as e:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail="There is no contest with this id",
-        )
+        ) from e
     return contest
 
 
@@ -81,11 +81,11 @@ async def get_contest_problems(
 ):
     try:
         contest = await contest_service.get_contest_by_id(db_session, contest_id)
-    except ContestDoesNotExistError:
+    except ContestDoesNotExistError as e:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail="There is no contest with this id",
-        )
+        ) from e
     if contest.start_time >= datetime.now():
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
@@ -93,11 +93,11 @@ async def get_contest_problems(
         )
     try:
         problems = await contest_service.get_contest_problems(db_session, contest_id)
-    except ContestProblemDoesNotExistError:
+    except ContestProblemDoesNotExistError as e:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail="There is no problems within contest",
-        )
+        ) from e
     return problems
 
 
@@ -115,16 +115,16 @@ async def join_contest(
 ):
     try:
         await contest_service.join_contest(db_session, contest_id, user.id)
-    except ContestDoesNotExistError:
+    except ContestDoesNotExistError as e:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
             detail="Contest not found",
-        )
-    except JoinContestError:
+        ) from e
+    except JoinContestError as e:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail="You've probably already joined the contest.",
-        )
+        ) from e
 
 
 @contest_router.delete("/{contest_id}/unjoin")
@@ -141,16 +141,16 @@ async def unjoin_contest(
 ):
     try:
         await contest_service.unjoin_contest(db_session, contest_id, user.id)
-    except ContestDoesNotExistError:
+    except ContestDoesNotExistError as e:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
             detail="Contest not found",
-        )
-    except UnjoinContestError:
+        ) from e
+    except UnjoinContestError as e:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail="You've probably already joined the contest.",
-        )
+        ) from e
 
 
 @contest_router.get("/{contest_id}/join-status")

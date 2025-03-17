@@ -55,11 +55,11 @@ async def get_public_problems(
         problems, count = await problem_service.get_public_problems(
             db_session, search_input, difficulty, offset, limit
         )
-    except OffsetAndLimitMustNotBeNegative:
+    except OffsetAndLimitMustNotBeNegative as e:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail="Offset and limit must not be negative",
-        )
+        ) from e
     return {"problems": problems, "count": count}
 
 
@@ -77,11 +77,11 @@ async def get_problem(
 ):
     try:
         problem = await problem_service.get_problem_by_id(db_session, problem_id)
-    except ProblemDoesNotExistError:
+    except ProblemDoesNotExistError as e:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail="There is no problem with this id",
-        )
+        ) from e
     return problem
 
 

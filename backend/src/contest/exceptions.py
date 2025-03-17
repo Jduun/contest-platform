@@ -17,7 +17,8 @@ class UnjoinContestError(Exception):
 
 
 class ContestProblemDoesNotExistError(Exception):
-    """Raised when someone tries to get a record from ContestProblem by an id that doesn't exist"""
+    """Raised when someone tries to get a record from ContestProblem by
+    an id that doesn't exist"""
 
     pass
 

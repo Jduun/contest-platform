@@ -9,6 +9,9 @@ RUN apt-get update && \
 COPY pyproject.toml poetry.lock ./
 
 RUN poetry config virtualenvs.create false \
-    && poetry install --no-root --without dev
+    && poetry install --no-root 
+    #--without dev
+
+ENV PYTHONPATH=/backend
 
 COPY . /backend
