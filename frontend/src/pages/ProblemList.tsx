@@ -18,6 +18,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select'
+import { API_URL } from '@/api'
 
 const difficultyColors: Record<string, string> = {
   easy: 'text-green-500',
@@ -46,7 +47,7 @@ export function ProblemList() {
   const fetchProblems = async () => {
     const token = localStorage.getItem('token')
     await axios
-      .get<ProblemsResponse>('http://localhost/api/problems', {
+      .get<ProblemsResponse>(`${API_URL}/api/problems`, {
         headers: {
           Authorization: `Bearer ${token}`,
         },
@@ -70,7 +71,7 @@ export function ProblemList() {
     const token = localStorage.getItem('token')
     const fetchUserInfo = async () => {
       await axios
-        .get<UserInfo>('http://localhost/api/users/me', {
+        .get<UserInfo>(`${API_URL}/api/users/me`, {
           headers: {
             Authorization: `Bearer ${token}`,
           },

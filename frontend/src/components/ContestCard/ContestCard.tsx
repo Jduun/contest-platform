@@ -10,6 +10,7 @@ import { useState, useEffect } from 'react'
 import axios, { AxiosError } from 'axios'
 import { toast } from 'sonner'
 import { Contest } from '@/dto'
+import { API_URL } from '@/api'
 
 export function ContestCard(contest: Contest) {
   const [joinContestStatus, setJoinContestStatus] = useState<boolean>(false)
@@ -18,7 +19,7 @@ export function ContestCard(contest: Contest) {
   const joinContest = async () => {
     const token = localStorage.getItem('token')
     await axios
-      .post(`http://localhost/api/contests/${contest.id}/join`, null, {
+      .post(`${API_URL}/api/contests/${contest.id}/join`, null, {
         headers: {
           Authorization: `Bearer ${token}`,
         },
@@ -38,7 +39,7 @@ export function ContestCard(contest: Contest) {
   const unjoinContest = async () => {
     const token = localStorage.getItem('token')
     await axios
-      .delete(`http://localhost/api/contests/${contest.id}/unjoin`, {
+      .delete(`${API_URL}/api/contests/${contest.id}/unjoin`, {
         headers: {
           Authorization: `Bearer ${token}`,
         },
@@ -59,7 +60,7 @@ export function ContestCard(contest: Contest) {
     const getJoinContestStatus = async () => {
       const token = localStorage.getItem('token')
       await axios
-        .get(`http://localhost/api/contests/${contest.id}/join-status`, {
+        .get(`${API_URL}/api/contests/${contest.id}/join-status`, {
           headers: {
             Authorization: `Bearer ${token}`,
           },

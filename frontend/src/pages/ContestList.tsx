@@ -7,6 +7,7 @@ import { usernameAtom } from '@/store/atoms'
 import { ContestCard } from '@/components/ContestCard/ContestCard'
 import moment from 'moment'
 import { UserInfo, Contest } from '@/dto'
+import { API_URL } from '@/api'
 
 export function ContestList() {
   const navigate = useNavigate()
@@ -17,7 +18,7 @@ export function ContestList() {
     const getUserInfo = async () => {
       const token = localStorage.getItem('token')
       await axios
-        .get<UserInfo>('http://localhost/api/users/me', {
+        .get<UserInfo>(`${API_URL}/api/users/me`, {
           headers: {
             Authorization: `Bearer ${token}`,
           },
@@ -35,7 +36,7 @@ export function ContestList() {
     const getContests = async () => {
       const token = localStorage.getItem('token')
       await axios
-        .get<Contest[]>('http://localhost/api/contests', {
+        .get<Contest[]>(`${API_URL}/api/contests`, {
           headers: {
             Authorization: `Bearer ${token}`,
           },

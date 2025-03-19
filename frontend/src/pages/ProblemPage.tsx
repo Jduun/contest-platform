@@ -11,6 +11,7 @@ import { useAtom } from 'jotai'
 import { programmingLanguageIdAtom } from '@/store/atoms'
 import { SubmissionList } from '@/components/SubmissionList/SubmissionList'
 import { Problem } from '@/dto'
+import { API_URL } from '@/api'
 
 export function ProblemPage() {
   const navigate = useNavigate()
@@ -30,7 +31,7 @@ export function ProblemPage() {
     const getProblem = async () => {
       const token = localStorage.getItem('token')
       await axios
-        .get<Problem>(`http://localhost/api/problems/${problem_id}`, {
+        .get<Problem>(`${API_URL}/api/problems/${problem_id}`, {
           headers: {
             Authorization: `Bearer ${token}`,
           },
@@ -55,7 +56,7 @@ export function ProblemPage() {
     const token = localStorage.getItem('token')
     await axios
       .post(
-        'http://localhost/api/submissions',
+        `${API_URL}/api/submissions`,
         {
           code: code,
           problem_id: problem?.id,
@@ -71,10 +72,10 @@ export function ProblemPage() {
         console.log('response data: ', response.data)
         const submissionId = response.data
         console.log('submission id: ' + submissionId)
-        console.log(`Event http://localhost/api/submissions/${submissionId}`)
+        console.log(`Event ${API_URL}/api/submissions/${submissionId}`)
         let submission_status = ''
         const eventSource = new EventSource(
-          `http://localhost/api/submissions/${submissionId}`,
+          `${API_URL}/api/submissions/${submissionId}`,
         )
         eventSource.onopen = () => {
           console.log('EventSource connected')
@@ -87,7 +88,7 @@ export function ProblemPage() {
         eventSource.onerror = (_error) => {
           eventSource.close()
           setCodeProcessing(false)
-          if (contest_id !== undefined) {
+          if (contest_id) {
             setPenaltyTime(submission_status)
           }
         }
@@ -102,7 +103,7 @@ export function ProblemPage() {
   const setPenaltyTime = async (status: string) => {
     const token = localStorage.getItem('token')
     await axios.post(
-      `http://localhost/api/contests/${contest_id}/problems/${problem_id}/set-penalty-time`,
+      `${API_URL}/api/contests/${contest_id}/problems/${problem_id}/set-penalty-time`,
       {
         status: status,
       },
@@ -182,7 +183,7 @@ export function ProblemPage() {
       )}
       <div>
         <div className="py-4">
-          {problem_id !== undefined ? (
+          {problem_id ? (
             <SubmissionList problem_id={problem_id} setCode={setCode} />
           ) : (
             <></>

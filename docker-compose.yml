@@ -19,6 +19,8 @@ services:
   frontend:
     build:
       context: ./frontend
+      args:
+        BACKEND_HOST: ${BACKEND_HOST}
     container_name: frontend
     networks:
       - app-network

@@ -9,6 +9,7 @@ import {
   TableRow,
 } from '@/components/ui/table'
 import { Contest, LeaderboardEntry, User } from '@/dto'
+import { API_URL } from '@/api'
 
 export function Leaderboard(contest: Contest) {
   const [leaderboard, setLeaderboard] = useState<LeaderboardEntry[]>([])
@@ -25,7 +26,7 @@ export function Leaderboard(contest: Contest) {
 
         // Получаем данные текущего пользователя
         const currentUserResponse = await axios.get(
-          `http://localhost/api/users/me`,
+          `${API_URL}/api/users/me`,
           {
             headers: { Authorization: `Bearer ${token}` },
           },
@@ -34,7 +35,7 @@ export function Leaderboard(contest: Contest) {
 
         // Получаем лидерборд
         const leaderboardResponse = await axios.get(
-          `http://localhost/api/contests/${contest.id}/leaderboard`,
+          `${API_URL}/api/contests/${contest.id}/leaderboard`,
           {
             headers: { Authorization: `Bearer ${token}` },
           },
@@ -52,7 +53,7 @@ export function Leaderboard(contest: Contest) {
 
         const userIds = leaderboardData.map((entry) => entry.user_id)
         const userPromises = userIds.map((id) =>
-          axios.get(`http://localhost/api/users/${id}`, {
+          axios.get(`${API_URL}/api/users/${id}`, {
             headers: { Authorization: `Bearer ${token}` },
           }),
         )

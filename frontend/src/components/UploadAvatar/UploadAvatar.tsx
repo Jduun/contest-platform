@@ -3,13 +3,14 @@ import axios from 'axios'
 import { Button } from '@/components/ui/button'
 import { Pencil } from 'lucide-react'
 import { toast } from 'sonner'
+import { API_URL } from '@/api'
 
 const uploadAvatar = async (file: File) => {
   const formData = new FormData()
   formData.append('avatar', file)
   const token = localStorage.getItem('token')
 
-  await axios.post('http://localhost/api/users/avatars', formData, {
+  await axios.post(`${API_URL}/api/users/avatars`, formData, {
     headers: {
       Authorization: `Bearer ${token}`,
       'Content-Type': 'multipart/form-data',

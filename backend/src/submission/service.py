@@ -171,9 +171,8 @@ async def submit_code_sse(db_session: AsyncSession, submission_id: uuid.UUID):
                     stderr = curr_stderr
                     break
 
-        yield f"event: locationUpdate\ndata: {status_description}"
-        "{'. ' + base64_to_string(stderr) if stderr else ''}\n\n"
-        await asyncio.sleep(5)
+        yield f"event: locationUpdate\ndata: {status_description}{'. ' + base64_to_string(stderr) if stderr else ''}\n\n" # noqa: E501
+        #await asyncio.sleep(5)
 
     stderr = base64_to_string(stderr) if stderr else ""
     query = (

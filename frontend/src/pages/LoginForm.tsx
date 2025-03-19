@@ -13,6 +13,7 @@ import { Label } from '@/components/ui/label'
 import axios from 'axios'
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
+import { API_URL } from '@/api'
 
 export function LoginForm() {
   const navigate = useNavigate()
@@ -28,7 +29,7 @@ export function LoginForm() {
       params.append('username', username)
       params.append('password', password)
 
-      const response = await axios.post('http://localhost/api/login', params, {
+      const response = await axios.post(`${API_URL}/api/login`, params, {
         headers: {
           'Content-Type': 'application/x-www-form-urlencoded',
         },

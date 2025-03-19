@@ -1,5 +1,9 @@
 FROM node:alpine as builder
 
+ARG BACKEND_HOST
+
+ENV VITE_BACKEND_HOST=$BACKEND_HOST
+
 COPY package*.json ./
 
 RUN npm install

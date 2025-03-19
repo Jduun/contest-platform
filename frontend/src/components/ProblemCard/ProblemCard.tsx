@@ -9,6 +9,7 @@ import { useNavigate } from 'react-router-dom'
 import axios from 'axios'
 import { CheckIcon, Cross2Icon } from '@radix-ui/react-icons'
 import { ProblemCardProps } from '@/dto'
+import { API_URL } from '@/api'
 
 export function ProblemCard(problemCardProps: ProblemCardProps) {
   const navigate = useNavigate()
@@ -26,7 +27,7 @@ export function ProblemCard(problemCardProps: ProblemCardProps) {
     const getProblemIsSolved = async () => {
       await axios
         .get<boolean>(
-          `http://localhost/api/problems/${problemCardProps.id}/is-solved`,
+          `${API_URL}/api/problems/${problemCardProps.id}/is-solved`,
           {
             headers: {
               Authorization: `Bearer ${token}`,

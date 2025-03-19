@@ -9,6 +9,7 @@ import { toast } from 'sonner'
 import { Timer } from '@/components/Timer/Timer'
 import { Leaderboard } from '@/components/Leaderboard/Leaderboard'
 import { Problem, Contest } from '@/dto'
+import { API_URL } from '@/api'
 
 export function ContestPage() {
   const navigate = useNavigate()
@@ -21,7 +22,7 @@ export function ContestPage() {
     const getContest = async () => {
       const token = localStorage.getItem('token')
       await axios
-        .get<Contest>(`http://localhost/api/contests/${id}`, {
+        .get<Contest>(`${API_URL}/api/contests/${id}`, {
           headers: {
             Authorization: `Bearer ${token}`,
           },
@@ -39,7 +40,7 @@ export function ContestPage() {
     const getContestProblems = async () => {
       const token = localStorage.getItem('token')
       await axios
-        .get<Problem[]>(`http://localhost/api/contests/${id}/problems`, {
+        .get<Problem[]>(`${API_URL}/api/contests/${id}/problems`, {
           headers: {
             Authorization: `Bearer ${token}`,
           },

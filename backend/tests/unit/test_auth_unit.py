@@ -17,12 +17,12 @@ from src.auth.service import (
 
 
 @pytest.fixture
-def dummy_user():
+def dummy_user() -> User:
     return User(id=uuid4(), username="testuser", password="dummy_hash")
 
 
 @pytest.fixture
-def dummy_role():
+def dummy_role() -> Role:
     return Role(id=uuid4(), name="admin")
 
 
