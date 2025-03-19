@@ -19,6 +19,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
+import { API_URL } from '@/api'
 
 export function Navbar() {
   const [username, setUsername] = useAtom(usernameAtom)
@@ -28,7 +29,7 @@ export function Navbar() {
   useEffect(() => {
     const token = localStorage.getItem('token')
     axios
-      .get<UserInfo>('http://localhost/api/users/me', {
+      .get<UserInfo>(`${API_URL}/api/users/me`, {
         headers: {
           Authorization: `Bearer ${token}`,
         },
@@ -46,7 +47,7 @@ export function Navbar() {
 
     const token = localStorage.getItem('token')
     axios
-      .get(`http://localhost/api/users/${username}/profile`, {
+      .get(`${API_URL}/api/users/${username}/profile`, {
         headers: {
           Authorization: `Bearer ${token}`,
         },

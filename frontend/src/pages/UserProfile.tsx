@@ -12,6 +12,7 @@ import { UploadAvatar } from '@/components/UploadAvatar/UploadAvatar'
 import { ProblemPieChart } from '@/components/PieChart/ProblemPieChart'
 import { SolvedProblemsStats } from '@/dto'
 import { Skeleton } from '@/components/ui/skeleton'
+import { API_URL } from '@/api'
 
 export function UserProfile() {
   const navigate = useNavigate()
@@ -30,7 +31,7 @@ export function UserProfile() {
     const token = localStorage.getItem('token')
     const setProfileData = async () => {
       await axios
-        .get(`http://localhost/api/users/${username}/profile`, {
+        .get(`${API_URL}/api/users/${username}/profile`, {
           headers: {
             Authorization: `Bearer ${token}`,
           },
@@ -45,7 +46,7 @@ export function UserProfile() {
     }
     const setProblemStats = async () => {
       await axios
-        .get(`http://localhost/api/stats/problems`, {
+        .get(`${API_URL}/api/stats/problems`, {
           headers: {
             Authorization: `Bearer ${token}`,
           },

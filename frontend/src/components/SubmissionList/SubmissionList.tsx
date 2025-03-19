@@ -12,6 +12,7 @@ import axios, { AxiosError } from 'axios'
 import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { Submission, SubmissionListProps } from '@/dto'
+import { API_URL } from '@/api'
 
 const formatDate = (isoString: string): string => {
   const date = new Date(isoString)
@@ -31,7 +32,7 @@ export function SubmissionList({ problem_id, setCode }: SubmissionListProps) {
     const getLastSubmissions = async () => {
       const token = localStorage.getItem('token')
       await axios
-        .get<Submission[]>(`http://localhost/api/submissions/`, {
+        .get<Submission[]>(`${API_URL}/api/submissions/`, {
           headers: {
             Authorization: `Bearer ${token}`,
           },
