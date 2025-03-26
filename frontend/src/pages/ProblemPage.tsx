@@ -12,6 +12,7 @@ import { programmingLanguageIdAtom } from '@/store/atoms'
 import { SubmissionList } from '@/components/SubmissionList/SubmissionList'
 import { Problem } from '@/dto'
 import { API_URL } from '@/api'
+import ChatSupport from '@/components/ui/chat-support'
 
 export function ProblemPage() {
   const navigate = useNavigate()
@@ -190,6 +191,7 @@ export function ProblemPage() {
           )}
         </div>
       </div>
+      <ChatSupport code={code} problem={problem}/>
     </div>
   )
 }

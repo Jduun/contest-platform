@@ -7,7 +7,7 @@ import 'react-tooltip/dist/react-tooltip.css'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { ExtendedActivityCalendar } from '@/components/ExtendedActivityCalendar/ExtendedActivityCalendar'
 import { useAtom } from 'jotai'
-import { usernameAtom } from '@/store/atoms'
+import { usernameAtom, avatarUrlAtom, activityDataAtom } from '@/store/atoms'
 import { UploadAvatar } from '@/components/UploadAvatar/UploadAvatar'
 import { ProblemPieChart } from '@/components/PieChart/ProblemPieChart'
 import { SolvedProblemsStats } from '@/dto'
@@ -18,9 +18,11 @@ export function UserProfile() {
   const navigate = useNavigate()
   const params = useParams()
   const username = params.username
-  const [activityData, setActivityData] = useState<[] | null>(null)
-  const [avatarUrl, setAvatarUrl] = useState<string | null>(null)
+  //const [activityData, setActivityData] = useState<[] | null>(null)
+  //const [avatarUrl, setAvatarUrl] = useState<string | null>(null)
   const [_username, _setUsername] = useAtom(usernameAtom)
+  const [avatarUrl, setAvatarUrl] = useAtom(avatarUrlAtom)
+  const [activityData, setActivityData] = useAtom(activityDataAtom)
   const [stats, setStats] = useState<SolvedProblemsStats>({
     easy: 0,
     medium: 0,
@@ -58,7 +60,9 @@ export function UserProfile() {
           navigate('/login')
         })
     }
-    setProfileData()
+    if (!avatarUrl || activityData.length === 0) {
+      setProfileData()
+    }
     setProblemStats()
   }, [])
 
@@ -68,7 +72,7 @@ export function UserProfile() {
       <div className="flex">
         <div className="flex flex-col">
           <Avatar className="h-52 w-52">
-            {avatarUrl !== null ? (
+            {avatarUrl ? (
               <>
                 <AvatarImage src={avatarUrl} />
                 <AvatarFallback>

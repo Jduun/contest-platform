@@ -1,5 +1,5 @@
-import axios, { AxiosError } from 'axios'
-import { useEffect, useState } from 'react'
+import axios from 'axios'
+import { useEffect } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import {
   NavigationMenu,
@@ -9,8 +9,7 @@ import {
 import { ModeToggle } from '@/components/ui/mode-toggle'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { useAtom } from 'jotai'
-import { usernameAtom } from '@/store/atoms'
-import { UserInfo } from '@/dto'
+import { usernameAtom , avatarUrlAtom, activityDataAtom } from '@/store/atoms'
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -22,29 +21,15 @@ import {
 import { API_URL } from '@/api'
 
 export function Navbar() {
-  const [username, setUsername] = useAtom(usernameAtom)
-  const [avatarUrl, setAvatarUrl] = useState<string | null>(null)
+  const [username, _setUsername] = useAtom(usernameAtom)
+  const [avatarUrl, setAvatarUrl] = useAtom(avatarUrlAtom)
+  const [activityData, setActivityData] = useAtom(activityDataAtom)
   const navigate = useNavigate()
 
   useEffect(() => {
-    const token = localStorage.getItem('token')
-    axios
-      .get<UserInfo>(`${API_URL}/api/users/me`, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      })
-      .then((response) => {
-        setUsername(response.data.username)
-      })
-      .catch((_err: AxiosError) => {
-        navigate('/login')
-      })
-  }, [])
-
-  useEffect(() => {
     if (!username) return
-
+    console.log(activityData)
+    if (avatarUrl && activityData.length !== 0) return
     const token = localStorage.getItem('token')
     axios
       .get(`${API_URL}/api/users/${username}/profile`, {
@@ -53,6 +38,7 @@ export function Navbar() {
         },
       })
       .then((response) => {
+        setActivityData(response.data.activity_calendar)
         setAvatarUrl(`${response.data.avatar_url}?v=${new Date().getTime()}`) // to prevent browser caching
       })
   }, [username])
@@ -69,9 +55,9 @@ export function Navbar() {
           >
             <Link to="/">Problems</Link>
           </NavigationMenuItem>
-          <NavigationMenuItem>
+          {/* <NavigationMenuItem>
             <Link to="/contests">Contests</Link>
-          </NavigationMenuItem>
+          </NavigationMenuItem> */}
         </NavigationMenuList>
       </NavigationMenu>
 

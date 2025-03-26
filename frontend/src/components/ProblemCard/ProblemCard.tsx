@@ -6,14 +6,12 @@ import {
 } from '@/components/ui/card'
 import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
-import axios from 'axios'
 import { CheckIcon, Cross2Icon } from '@radix-ui/react-icons'
 import { ProblemCardProps } from '@/dto'
-import { API_URL } from '@/api'
 
 export function ProblemCard(problemCardProps: ProblemCardProps) {
   const navigate = useNavigate()
-  const [isSolved, setIsSolved] = useState<boolean | null>(null)
+  const [isSolved, _setIsSolved] = useState<boolean | null>(null)
 
   const difficultyColors: Record<string, string> = {
     easy: 'text-green-500',
@@ -22,23 +20,23 @@ export function ProblemCard(problemCardProps: ProblemCardProps) {
   }
 
   useEffect(() => {
-    const token = localStorage.getItem('token')
+    // const token = localStorage.getItem('token')
 
-    const getProblemIsSolved = async () => {
-      await axios
-        .get<boolean>(
-          `${API_URL}/api/problems/${problemCardProps.id}/is-solved`,
-          {
-            headers: {
-              Authorization: `Bearer ${token}`,
-            },
-          },
-        )
-        .then((response) => {
-          setIsSolved(response.data)
-        })
-    }
-    getProblemIsSolved()
+    // const getProblemIsSolved = async () => {
+    //   await axios
+    //     .get<boolean>(
+    //       `${API_URL}/api/problems/${problemCardProps.id}/is-solved`,
+    //       {
+    //         headers: {
+    //           Authorization: `Bearer ${token}`,
+    //         },
+    //       },
+    //     )
+    //     .then((response) => {
+    //       setIsSolved(response.data)
+    //     })
+    // }
+    // getProblemIsSolved()
   }, [])
 
   return (

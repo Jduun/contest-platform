@@ -27,6 +27,7 @@ export function LoginForm() {
       // Use URLSearchParams to send data in x-www-form-urlencoded format
       const params = new URLSearchParams()
       params.append('username', username)
+      
       params.append('password', password)
 
       const response = await axios.post(`${API_URL}/api/login`, params, {
