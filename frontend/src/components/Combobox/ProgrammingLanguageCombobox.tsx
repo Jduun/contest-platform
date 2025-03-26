@@ -15,8 +15,7 @@ import {
   PopoverTrigger,
 } from '@/components/ui/popover'
 import { useAtom } from 'jotai'
-import { programmingLanguageIdAtom } from '@/store/atoms'
-import { programmingLanguagesAtom } from '@/store/atoms'
+import { programmingLanguageIdAtom, programmingLanguagesAtom } from '@/store/atoms'
 
 export function ProgrammingLanguageCombobox() {
   const [open, setOpen] = React.useState(false)

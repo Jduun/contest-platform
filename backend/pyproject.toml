@@ -23,6 +23,8 @@ aiobotocore = "^2.19.0"
 redis = {extras = ["asyncio"], version = "^5.2.1"}
 aioredis = "^2.0.1"
 requests = "^2.32.3"
+litellm = "^1.63.12"
+sympy = "^1.13.3"
 
 
 [tool.poetry.group.dev.dependencies]

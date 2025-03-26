@@ -29,7 +29,7 @@ const difficultyColors: Record<string, string> = {
 export function ProblemList() {
   const navigate = useNavigate()
   const [searchParams] = useSearchParams()
-  const [_username, setUsername] = useAtom(usernameAtom)
+  const [username, setUsername] = useAtom(usernameAtom)
   const [problems, setProblems] = useState<Problem[] | []>([])
   const [pagesCount, setPageCount] = useState<number>(1)
   const [searchInput, setSearchInput] = useState<string>('')
@@ -84,8 +84,10 @@ export function ProblemList() {
           return
         })
     }
-    fetchUserInfo()
-    fetchProblems()
+    if (!username) {
+      fetchUserInfo()
+    }
+    //fetchProblems()
   }, [])
 
   useEffect(() => {

@@ -50,7 +50,7 @@ class S3Client:
             await s3_client.put_object(
                 Bucket=self.bucket_name, Key=key, Body=await file.read()
             )
-        url = f"http://localhost:{os.getenv('MINIO_PORT')}/{self.bucket_name}/{key}"
+        url = f"http://{os.getenv('BACKEND_HOST')}:{os.getenv('MINIO_PORT')}/{self.bucket_name}/{key}"
         return url
 
     async def check_file(self, filename: str) -> bool:

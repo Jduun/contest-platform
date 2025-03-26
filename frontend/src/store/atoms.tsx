@@ -1,6 +1,16 @@
 import { atom } from 'jotai'
+import { Problem } from '@/dto';
+
+interface ProblemsState {
+  [key: number]: Problem[]
+}
 
 export const usernameAtom = atom('')
+export const botAvatarUrlAtom = atom('https://img.freepik.com/free-vector/chatbot-chat-message-vectorart_78370-4104.jpg')
+export const avatarUrlAtom = atom('')
+export const activityDataAtom = atom([])
+
+export const problemsAtom = atom<ProblemsState>({})
 export const programmingLanguageIdAtom = atom('')
 export const programmingLanguagesAtom = atom([
   {

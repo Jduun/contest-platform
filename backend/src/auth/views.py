@@ -49,7 +49,7 @@ async def register(
     db_session: DbSession,
 ):
     min_username_length = 1
-    min_password_length = 8
+    min_password_length = 1
     if len(user_add.username) < min_username_length:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
